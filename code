@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pave X Express 2026</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM & Babel -->
+    <script type="importmap">
+    {
+      "imports": {
+        "react": "https://esm.sh/react@18.2.0",
+        "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+        "lucide-react": "https://esm.sh/lucide-react@0.344.0"
+      }
+    }
+    </script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        /* Custom Scrollbar for a cleaner mobile app feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        body {
+            background-color: #0f172a; /* Slate 900 background for desktop view */
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen">
+
+    <div id="root" class="w-full max-w-md h-screen bg-gray-50 flex flex-col relative overflow-hidden sm:rounded-3xl sm:h-[90vh] sm:border-8 sm:border-slate-800 sm:shadow-2xl"></div>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { 
+            Car, MapPin, Calendar, Music, Trophy, Receipt, ChevronRight, Dog, 
+            AlertCircle, Info, Navigation, Clock, BatteryCharging, Fuel, Zap, 
+            CheckCircle2, Utensils, Hotel, ArrowRightLeft, User, Ticket, Star, 
+            PartyPopper, Mic2, ChevronDown, ChevronUp, DollarSign, Briefcase, 
+            AlertTriangle, TrendingUp, Coffee, Warehouse, ZapOff, Gauge, 
+            ParkingCircle, Map as MapIcon, Timer, ShoppingBag, Award, Activity, 
+            Mountain, Footprints, Camera, Image as ImageIcon
+        } from 'lucide-react';
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('itinerary');
+            const [carType, setCarType] = useState('camaro'); // 'camaro' or 'mache'
+            const [expandedStop, setExpandedStop] = useState(null); 
+            const [expandedEvent, setExpandedEvent] = useState(null);
+            const [expandedMoney, setExpandedMoney] = useState(null);
+            
+            const tripMileage = 1430; 
+            const rateMachE = 0.17;
+            const rateCamaro = 0.18;
+            const irsStandardRate = 0.70;
+
+            const tripData = {
+                title: "Pave X Express 2026",
+                route: "New Albany → NOLA → Nashville",
+                dates: "Feb 7 - Feb 12, 2026",
+                costs: {
+                    hotelNOLA: 125,
+                    hotelNights: 4, 
+                    concert: 92,
+                    nba: 45,
+                    paveX: 595,
+                    drivingCost: carType === 'camaro' ? (tripMileage * rateCamaro).toFixed(2) : (tripMileage * rateMachE).toFixed(2),
+                    mileageDeduction: (tripMileage * irsStandardRate).toFixed(2)
+                }
+            };
+
+            const totalHotelCost = tripData.costs.hotelNOLA * tripData.costs.hotelNights;
+            const totalTaxDeduction = parseFloat(totalHotelCost.toString()) + parseFloat(tripData.costs.mileageDeduction) + tripData.costs.paveX;
+
+            const getMapUrl = (location, prevLocation = null, isTrail = false, isParade = false) => {
+                const zoom = prevLocation ? 6 : (isTrail || isParade ? 16 : 15);
+                const mapType = (isTrail || isParade) ? 'k' : 'm'; 
+                
+                if (prevLocation) {
+                    return `https://maps.google.com/maps?saddr=${encodeURIComponent(prevLocation)}&daddr=${encodeURIComponent(location)}&t=&z=${zoom}&ie=UTF8&iwloc=&output=embed`;
+                }
+                return `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=${mapType}&z=${zoom}&ie=UTF8&iwloc=&output=embed`;
+            };
+
+            const TabButton = ({ id, icon: Icon, label }) => (
+                <button
+                    onClick={() => setActiveTab(id)}
+                    className={`flex flex-col items-center justify-center py-2 px-4 flex-1 transition-all ${
+                        activeTab === id ? 'text-blue-600 border-t-2 border-blue-600' : 'text-gray-500 hover:text-blue-400'
+                    }`}
+                >
+                    <Icon size={20} />
+                    <span className="text-[10px] mt-1 font-medium uppercase tracking-wider">{label}</span>
+                </button>
+            );
+
+            const renderIcon = (IconComponent, props = {}) => {
+                return <IconComponent {...props} />;
+            };
+
+            const itinerary = [
+                {
+                    day: "Saturday, Feb 7",
+                    title: "The NOLA Push (715 Mi)",
+                    events: [
+                        { 
+                            id: "sat-start",
+                            time: "5:30 AM", 
+                            title: "Wheels Up", location: "New Albany, IN", type: "travel",
+                            distPrev: 0, distNext: carType === 'mache' ? 105 : 175, duration: 0, timeToNext: carType === 'mache' ? "1h 40m" : "2h 45m",
+                            longDesc: "The 2026 Pave X journey begins at dawn. We are departing at 5:30 AM to ensure we clear the Louisville and Nashville morning corridors before the Saturday rush. This early start is designed to get us into New Orleans by late afternoon, allowing time to check into the Hampton Inn and grab a celebratory dinner in the Warehouse District."
+                        },
+                        { 
+                            id: "sat-stop1",
+                            time: carType === 'mache' ? "7:15 AM" : "8:15 AM", 
+                            title: carType === 'mache' ? "Buc-ee's Smiths Grove" : "Kroger Fuel Nashville", 
+                            location: carType === 'mache' ? "Smiths Grove, KY" : "Nashville, TN", 
+                            type: "logistics",
+                            prevLocation: "New Albany, IN",
+                            distPrev: carType === 'mache' ? 105 : 175, distNext: carType === 'mache' ? 185 : 85, duration: 40, timeToNext: "1h 20m",
+                            longDesc: carType === 'camaro' 
+                                ? "Tactical Reset: 175 miles in. We hit the Nashville Kroger early to utilize high-value fuel points and top off the tank. This ensures a full 320-mile range as we enter Alabama. Grab a large coffee here; the next leg into Hartselle is quick, but it's our last Kroger stop for a long while."
+                                : "EV Hub #1: Smiths Grove Buc-ee's is perfectly positioned at 105 miles. This stop is essential for its high-output Level 3 chargers. We'll reach 90% charge while grabbing a breakfast taco, preparing for the 185-mile push through central Kentucky and into northern Alabama."
+                        },
+                        { 
+                            id: "sat-stop2",
+                            time: carType === 'mache' ? "10:40 AM" : "9:50 AM", 
+                            title: carType === 'mache' ? "Buc-ee's Athens" : "Kroger Fuel Hartselle", 
+                            location: carType === 'mache' ? "Athens, AL" : "Hartselle, AL", 
+                            prevLocation: carType === 'mache' ? "Smiths Grove, KY" : "Nashville, TN",
+                            type: "logistics",
+                            distPrev: carType === 'mache' ? 185 : 85, distNext: carType === 'mache' ? 191 : 310, duration: 40, timeToNext: carType === 'camaro' ? "4h 30m" : "2h 45m",
+                            longDesc: carType === 'camaro'
+                                ? "MEGA LEG START: Filling at Hartselle Kroger sets up a 310-mile push to Robertsdale. This pushes the 320-mile SS tank to the limit. Manage throttle carefully!" 
+                                : "Athens Buc-ee's staging. Critical 191-mile leg ahead to Hope Hull. Reach full charge to handle elevation and highway drain."
+                        },
+                        { 
+                            id: "sat-stop3",
+                            time: carType === 'mache' ? "2:05 PM" : "2:35 PM", 
+                            title: carType === 'mache' ? "Flying J Hope Hull" : "Buc-ee's Robertsdale", 
+                            location: carType === 'mache' ? "Hope Hull, AL" : "Robertsdale, AL", 
+                            prevLocation: carType === 'mache' ? "Athens, AL" : "Hartselle, AL",
+                            type: "logistics",
+                            distPrev: carType === 'mache' ? 191 : 310, distNext: carType === 'mache' ? 150 : 144, duration: 40, timeToNext: "2h 15m",
+                            longDesc: carType === 'camaro' 
+                                ? "Range Success! Arrival at Buc-ee's Robertsdale on fumes (10mi range left). Beaver Nuggets and a celebratory top-off for the final night push." 
+                                : "Hope Hull verified anchor. Reliable high-speed charging bridges the gap from Central Alabama to the Mobile coastline."
+                        },
+                        { 
+                            id: "sat-arrival",
+                            time: carType === 'mache' ? "5:00 PM" : "5:15 PM", title: "Arrive NOLA Hotel", location: "Convention Center Blvd, New Orleans", 
+                            prevLocation: carType === 'mache' ? "Hope Hull, AL" : "Robertsdale, AL",
+                            type: "logistics",
+                            distPrev: carType === 'mache' ? 150 : 144, distNext: 0, duration: 0, timeToNext: "0m",
+                            longDesc: "Welcome to NOLA Central Time. Staying all 4 nights at the Hampton Inn & Suites Convention Center. Historic warehouse district, walkable to everything."
+                        }
+                    ]
+                },
+                {
+                    day: "Sunday, Feb 8",
+                    title: "Morning Run & Barkus",
+                    events: [
+                        { 
+                            id: "sun-run", 
+                            time: "8:00 AM", 
+                            title: "Mississippi Riverfront Run", 
+                            location: "Woldenberg Park, New Orleans", 
+                            type: "leisure",
+                            isTrail: true,
+                            longDesc: "TRAIL RUN: The Mississippi River Trail is New Orleans' best running path. 3.5-mile loop along the water through Woldenberg Park. PRO-TIP: Sync your AllTrails app to track your speed. Perfectly paved with zero stoplights and a great river breeze."
+                        },
+                        { 
+                            id: "barkus",
+                            time: "2:00 PM", title: "Krewe of Barkus Parade", location: "Royal St, New Orleans", type: "leisure",
+                            isParade: true,
+                            details: { title: "Mystic Krewe of Barkus", content: "NOLA's premier dog parade! This year's theme 'Wicked & Wagged' features costumed dogs. A walking parade through the historic Quarter district.", icon: Dog, cost: "Free" },
+                            longDesc: "PARADE PHOTO: The route loops through the heart of the Quarter. Starting at Armstrong Park, down Rampart, into St. Ann and Royal. 15-min walk from the hotel."
+                        }
+                    ]
+                },
+                {
+                    day: "Monday, Feb 9",
+                    title: "Pave X Launch & NBA",
+                    events: [
+                        { 
+                            id: "mon-round", time: "8:00 AM", title: "Roundtable Discussions", location: "New Orleans Convention Center", type: "business", 
+                            details: { title: "Contractor Roundtables", content: "Peer sharing on crack-sealing and crew logistics. Essential networking with owners to prepare for 2026.", icon: Briefcase, cost: "Included" }
+                        },
+                        { 
+                            id: "mon-trade", time: "10:00 AM", title: "Trade Show Expo Opens", location: "Exhibit Hall", type: "business", 
+                            details: { title: "Trade Show Floor", content: "200,000 sq ft of equipment. Focus on new sealcoating spray bars and high-efficiency melting kettles.", icon: TrendingUp, cost: "Included" }
+                        },
+                        { 
+                            id: "mon-kickoff", time: "4:00 PM", title: "Official Kickoff Party", location: "Convention Center Lot", type: "business", 
+                            details: { title: "Kickoff Celebration", content: "Networking, live music, and catering. Meet Pave X speakers and executives informally.", icon: PartyPopper, cost: "Included" }
+                        },
+                        { 
+                            id: "nba",
+                            time: "7:00 PM", title: "Pelicans vs. Kings", location: "Smoothie King Center, New Orleans", type: "sports",
+                            details: { title: "NBA: Pelicans vs Kings", content: "Watch Zion. Target Upper Section Front Row for broadcast-style view. 15 min walk from Warehouse District.", icon: Ticket, cost: "$45 avg" }
+                        }
+                    ]
+                },
+                {
+                    day: "Tuesday, Feb 10",
+                    title: "Brad Lea & Awards Night",
+                    events: [
+                        { 
+                            id: "bradlea",
+                            time: "10:00 AM", title: "Brad Lea Keynote", location: "Main Stage", type: "business",
+                            details: { title: "Brad Lea: Unstoppable", content: "CEO of Lightspeed VT. Keynote on sales mindset and automated systems to scale your sealcoating business.", icon: User, cost: "Free" }
+                        },
+                        { 
+                            id: "tue-reception", time: "5:00 PM", title: "Networking Reception", location: "Convention Center", type: "business", 
+                            longDesc: "Final networking session on the trade show floor. Sponsored drinks and apps—prime time to close equipment deals."
+                        },
+                        { 
+                            id: "tue-awards", time: "6:00 PM", title: "Pavement Awards Ceremony", location: "Convention Center Ballroom", type: "business", 
+                            details: { title: "Pavement Awards", content: "Industry 'Oscars.' Benchmarking A&S work against the top 1% of firms nationwide. Excellence in striping and paving.", icon: Award, cost: "Included" }
+                        },
+                        { id: "tuesdinner", time: "8:00 PM", title: "Commander's Palace Dinner", location: "1403 Washington Ave, New Orleans", type: "leisure",
+                            details: { title: "Garden District Dining", content: "Historic landmark defined by refined Creole cuisine. 25-cent martinis and world-class hospitality since 1893.", icon: Utensils, cost: "$100/pp" }
+                        }
+                    ]
+                },
+                {
+                    day: "Wednesday, Feb 11",
+                    title: "The Nashville Sprint (536 Mi)",
+                    events: [
+                        { id: "wed-start", time: carType === 'mache' ? "7:30 AM" : "8:00 AM", title: "Depart NOLA", location: "Convention Center Blvd, NOLA", type: "travel", distPrev: 0, distNext: 132, duration: 0, timeToNext: "2h 00m",
+                        longDesc: "Heading North. The return sprint to Nashville is a 536-mile calculated move to make the 7:00 PM Opry show. The Mach-E starts at 7:30 AM to build its charging buffer for the Alabama incline legs."
+                        },
+                        { 
+                            id: "wed-fuel1",
+                            time: "10:00 AM", title: "Pilot Theodore", location: "Theodore, AL", prevLocation: "New Orleans, LA", type: "logistics",
+                            distPrev: 132, distNext: carType === 'camaro' ? 310 : 150, duration: 40, timeToNext: carType === 'mache' ? "4h 30m" : "2h 10m",
+                            longDesc: "User Verified: Exactly 132 miles from NOLA. Camaro SS must fill to the brim for the 310-mile return 'Mega Leg' back to Hartselle. We'll be skipping Montgomery entirely to maximize V8 efficiency and fuel points."
+                        },
+                        { 
+                            id: "wed-fuel2",
+                            time: carType === 'mache' ? "1:00 PM" : "3:00 PM", 
+                            title: carType === 'camaro' ? "Kroger Fuel Hartselle" : "Flying J Hope Hull", 
+                            location: carType === 'camaro' ? "Hartselle, AL" : "Hope Hull, AL", 
+                            prevLocation: "Theodore, AL",
+                            type: "logistics",
+                            distPrev: carType === 'camaro' ? 310 : 150, distNext: carType === 'camaro' ? 85 : 191, duration: 40, timeToNext: carType === 'camaro' ? "1h 20m" : "2h 45m",
+                            longDesc: carType === 'camaro' 
+                                ? "Hartselle Points Reclaim: After the 310-mile range-stretching leg, we arrive back at our Kroger anchor. Fill up here to reclaim fuel points and ensure the V8 is ready for the Tennessee hill climbs into Nashville."
+                                : "Mach-E Hub: Back at the Flying J in Hope Hull. This 150-mile leg through South Alabama ensures we have the juice for the long 191-mile verified push into the Athens Buc-ee's high-speed chargers."
+                        },
+                        { 
+                            id: "concert",
+                            time: "7:00 PM", title: "Conservation Aid Concert", location: "2804 Opryland Dr, Nashville", prevLocation: carType === 'camaro' ? "Hartselle, AL" : "Hope Hull, AL", type: "event",
+                            details: { title: "Conservation Aid 2026", content: "A special songwriters round featuring Thomas Rhett and Dustin Lynch. Intimate storyteller format at the Grand Ole Opry.", icon: Mic2, cost: "$92" },
+                            longDesc: "The Grand Finale. An intimate night at the legendary Grand Ole Opry. Thomas Rhett and Dustin Lynch share the stage in a storytelling format. This is the perfect way to close out the Pave X business trip before the final drive home."
+                        }
+                    ]
+                }
+            ];
+
+            const moneyBreakdown = [
+                { id: "tax-pavex", item: "Pave X Registration", cost: `$${tripData.costs.paveX}`, status: "Deduction", reason: "Direct industry training.", longDesc: "100% deductible as a business expense. Pave X is a professional trade show directly related to A&S Sealcoating operations. The IRS allows full deduction for professional development events including registration fees for both owners." },
+                { id: "tax-hotel", item: "NOLA Hotel (4 Nights)", cost: `$${totalHotelCost.toFixed(2)}`, status: "Deduction", reason: "Business Lodging.", longDesc: "Lodging is 100% deductible when the primary purpose of the travel is professional. Since you are in NOLA specifically for the Pave X schedule, all 4 nights at the Hampton Inn are allowable deductions under current business travel provisions. We've shifted from Slidell to maximize business presence and networking availability." },
+                { id: "tax-mileage", item: `Mileage Deduction`, cost: `~$${tripData.costs.mileageDeduction}`, status: "Deduction", reason: "IRS Standard Rate.", longDesc: `The IRS standard rate (~70¢/mi) accounts for the total cost of ownership including fuel, maintenance, and depreciation. For this 1,430-mile trip, the deduction is ~$${tripData.costs.mileageDeduction}, which is almost 4x your actual out-of-pocket fuel/charge costs.` },
+                { id: "tax-fuel", item: "Actual Driving Cost", cost: `$${tripData.costs.drivingCost}`, status: "Expense", reason: carType === 'camaro' ? "$0.18/mi" : "$0.17/mi", longDesc: "Out-of-pocket spend for fuel or high-speed charging. Vital for cash flow tracking at A&S." }
+            ];
+
+            const funEvents = [
+                { id: "barkus", title: "Barkus Dog Parade", time: "Sun 2 PM", icon: Dog, desc: "Costumed pups on Royal Street.", cost: "Free", color: "from-orange-400 to-red-500", longDesc: "Experience the unique 'walking parade' culture of New Orleans. Hundreds of costumed dogs lead their humans through the historic French Quarter. It's a massive neighborhood party that showcases the city's vibrant local spirit and community pride. Perfect for soaking in the energy before the work week begins." },
+                { id: "nba", title: "Pelicans vs Kings", time: "Mon 7 PM", icon: Ticket, desc: "NBA Home Game.", cost: "$45", color: "from-blue-600 to-indigo-700", longDesc: "Catch Zion Williamson and the Pels at the Smoothie King Center. We've mapped the best value seats—front row of the upper bowl. You get an unrestricted view of the whole tactical play for less than $50 per seat. Only a short 15-minute walk through the Warehouse District from our hotel." },
+                { id: "bradlea", title: "Brad Lea Keynote", time: "Tue 10 AM", icon: User, desc: "Scaling & Sales Bio.", cost: "Badge", color: "from-amber-400 to-orange-600", longDesc: "Master closer Brad Lea shares the mindset for massive growth. Free educational event for attendees." },
+                { id: "concert", title: "Conservation Aid", time: "Wed 7 PM", icon: Music, desc: "Grand Ole Opry Live.", cost: "$92", color: "from-purple-600 to-pink-600", longDesc: "Acoustic songwriter round with Thomas Rhett and Dustin Lynch at the Grand Ole Opry." }
+            ];
+
+            const fuelStats = [
+                { label: "Est. Trip Cost", value: `$${tripData.costs.drivingCost}`, icon: DollarSign },
+                { label: "Tank Limit", value: carType === 'camaro' ? "320 Mi" : "185 Mi", icon: Gauge },
+                { label: "Hotel Total", value: `$${totalHotelCost.toFixed(0)}`, icon: Hotel },
+            ];
+
+            const toggleStop = (id) => setExpandedStop(expandedStop === id ? null : id);
+            const toggleMoney = (id) => setExpandedMoney(expandedMoney === id ? null : id);
+
+            return (
+                <div className="bg-gray-100 flex-1 w-full overflow-hidden flex flex-col h-full sm:rounded-3xl">
+                {/* Header */}
+                <div className="bg-slate-950 text-white p-6 relative overflow-hidden shrink-0">
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                    {carType === 'camaro' ? renderIcon(Fuel, { size: 120 }) : renderIcon(Zap, { size: 120 })}
+                    </div>
+                    <div className="flex justify-between items-start relative z-10">
+                    <div>
+                        <h1 className="text-2xl font-black tracking-tight italic uppercase leading-none">Pave X Express</h1>
+                        <p className="text-slate-400 text-[10px] font-bold flex items-center gap-1 mt-2 uppercase tracking-tighter">
+                        <Navigation size={10} /> {tripData.route}
+                        </p>
+                    </div>
+                    <button 
+                        onClick={() => setCarType(carType === 'camaro' ? 'mache' : 'camaro')}
+                        className={`p-2 rounded-xl border flex flex-col items-center transition-all active:scale-95 ${
+                            carType === 'camaro' 
+                            ? 'bg-amber-500 border-amber-400 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]' 
+                            : 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]'
+                        }`}
+                    >
+                        <Car size={20} />
+                        <span className="text-[10px] font-black mt-1 uppercase">
+                        {carType === 'camaro' ? 'SS/V8' : 'MACH-E'}
+                        </span>
+                    </button>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2 mt-6">
+                    {fuelStats.map((stat, i) => {
+                        const Icon = stat.icon;
+                        return (
+                        <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2 text-center">
+                            {renderIcon(stat.icon, { size: 14, className: "mx-auto mb-1 text-slate-400" })}
+                            <p className="text-[9px] opacity-60 leading-none uppercase font-bold">{stat.label}</p>
+                            <p className="text-xs font-black mt-1 tracking-tight">{stat.value}</p>
+                        </div>
+                        );
+                    })}
+                    </div>
+                </div>
+
+                {/* Main Content Area */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
+                    
+                    {activeTab === 'itinerary' && (
+                    <div className="space-y-4">
+                        <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 flex items-center gap-3">
+                        <MapIcon size={16} className="text-blue-500 shrink-0" />
+                        <p className="text-[10px] text-blue-700 font-black leading-tight uppercase tracking-tighter">
+                            Map Zoom Level Calibrated: Wide-angle view for long legs enabled.
+                        </p>
+                        </div>
+
+                        {itinerary.map((day, idx) => (
+                        <div key={idx} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div className="bg-gray-50 p-3 border-b border-gray-100 flex justify-between items-center">
+                            <h3 className="font-bold text-gray-800 text-xs flex items-center gap-2 uppercase tracking-tight">
+                                <Calendar size={12} className="text-blue-600" /> {day.day}
+                            </h3>
+                            <span className={`text-[9px] px-2 py-0.5 rounded font-black uppercase tracking-tighter ${
+                                idx === 0 || idx === 4 ? 'bg-slate-200 text-slate-700' : 'bg-green-100 text-green-700'
+                            }`}>
+                                {idx === 0 || idx === 4 ? "Travel" : "Pave X"}
+                            </span>
+                            </div>
+                            <div className="p-4 space-y-4">
+                            {day.events.map((event, eIdx) => {
+                                const IconComp = event.id === 'barkus' ? Dog :
+                                            event.id === 'sun-run' ? Activity :
+                                            event.id === 'tue-awards' ? Award :
+                                            event.type === 'business' ? Briefcase : 
+                                            event.type === 'sports' ? Trophy : 
+                                            event.type === 'travel' ? Car : Clock;
+                                
+                                const isRisky = carType === 'camaro' && event.distNext >= 300;
+
+                                return (
+                                <div key={eIdx} onClick={() => toggleStop(event.id)} className={`flex gap-4 p-2 rounded-xl border border-transparent cursor-pointer hover:bg-gray-50 active:scale-95 transition-all ${expandedStop === event.id ? 'bg-slate-50 border-slate-200 shadow-inner' : ''}`}>
+                                    <div className="flex flex-col items-center shrink-0">
+                                    <div className={`p-2 rounded-lg relative ${
+                                        event.id === 'sun-run' ? 'bg-indigo-100 text-indigo-700' :
+                                        event.id === 'barkus' ? 'bg-amber-100 text-amber-700' :
+                                        event.type === 'business' ? 'bg-amber-100 text-amber-700' :
+                                        event.type === 'logistics' ? 'bg-blue-100 text-blue-700' :
+                                        event.type === 'sports' ? 'bg-red-100 text-red-700' : 
+                                        event.type === 'travel' ? 'bg-slate-800 text-white' : 'bg-slate-100 text-slate-600'
+                                    }`}>
+                                        <IconComp size={14} />
+                                        {isRisky && <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></div>}
+                                    </div>
+                                    {eIdx < day.events.length - 1 && <div className="w-px h-full bg-gray-100 mt-2"></div>}
+                                    </div>
+                                    <div className="flex-1 overflow-hidden">
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex flex-col overflow-hidden mr-2">
+                                            <span className="font-bold text-gray-900 text-sm leading-tight truncate">{event.title}</span>
+                                            {isRisky && <span className="text-[8px] font-black text-red-600 uppercase tracking-widest mt-0.5">Critical Range Leg</span>}
+                                        </div>
+                                        <span className="text-[10px] font-mono text-gray-400 bg-gray-50 px-1 rounded border whitespace-nowrap">{event.time}</span>
+                                    </div>
+                                    <p className="text-[11px] text-gray-500 mt-0.5 font-medium uppercase tracking-tighter truncate"><MapPin size={10} className="inline mr-1"/>{event.location}</p>
+
+                                    {expandedStop === event.id && (
+                                        <div className="mt-3 animate-in slide-in-from-top-2 duration-300">
+                                        
+                                        {/* DYNAMIC MEDIA/MAP/HEADER PREVIEW */}
+                                        <div className="w-full h-44 bg-gray-200 rounded-2xl overflow-hidden mb-3 border border-gray-200 shadow-inner relative group">
+                                            {event.id === 'barkus' ? (
+                                            <div className="w-full h-full relative">
+                                                <img 
+                                                src="https://images.unsplash.com/photo-1598133894008-61f7fdb8cc3a?auto=format&fit=crop&w=800&q=80" 
+                                                alt="Barkus Parade NOLA"
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => { e.target.src = 'https://via.placeholder.com/800x440?text=Official+Parade+Route+Map'; }}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                                                <div className="absolute bottom-2 left-2 flex items-center gap-2">
+                                                <div className="bg-amber-500 p-1 rounded-md"><Camera size={10} className="text-black" /></div>
+                                                <span className="text-[8px] font-black text-white uppercase tracking-widest">Route View: French Quarter Loop</span>
+                                                </div>
+                                            </div>
+                                            ) : event.type === 'business' ? (
+                                            // Cool Business Card Display
+                                            <div className="w-full h-full bg-slate-900 relative p-6 flex flex-col justify-between overflow-hidden">
+                                                <div className="absolute top-0 right-0 p-4 opacity-10">
+                                                    <IconComp size={120} className="text-white" />
+                                                </div>
+                                                <div className="absolute -bottom-4 -left-4 w-24 h-24 bg-amber-500 rounded-full blur-2xl opacity-20"></div>
+                                                
+                                                <div className="relative z-10">
+                                                <span className="text-[10px] font-black tracking-[0.2em] text-amber-500 uppercase">Pave X Official</span>
+                                                <h3 className="text-2xl font-black text-white mt-1 leading-none italic">{event.title}</h3>
+                                                </div>
+                                                
+                                                <div className="relative z-10 flex items-center gap-3">
+                                                    <div className="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
+                                                    <p className="text-[8px] text-slate-400 uppercase font-bold">Location</p>
+                                                    <p className="text-xs font-bold text-white truncate max-w-[120px]">{event.location}</p>
+                                                    </div>
+                                                    {event.details?.cost === 'Included' && (
+                                                    <div className="bg-green-500/20 backdrop-blur-md px-3 py-1.5 rounded-lg border border-green-500/30">
+                                                        <p className="text-[8px] text-green-300 uppercase font-bold">Access</p>
+                                                        <p className="text-xs font-bold text-green-100">Granted</p>
+                                                    </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            ) : (
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                frameBorder="0"
+                                                style={{ border: 0 }}
+                                                src={getMapUrl(event.location, event.prevLocation, event.isTrail, event.isParade)}
+                                                allowFullScreen
+                                            ></iframe>
+                                            )}
+                                        </div>
+
+                                        {event.isTrail && (
+                                            <div className="grid grid-cols-3 gap-2 mb-3">
+                                            <div className="bg-indigo-50 border border-indigo-100 p-2 rounded-xl text-center">
+                                                <Activity size={12} className="mx-auto mb-1 text-indigo-500" />
+                                                <p className="text-[8px] uppercase font-bold text-indigo-400">Distance</p>
+                                                <p className="text-[10px] font-black text-indigo-700">3.5 Mi</p>
+                                            </div>
+                                            <div className="bg-indigo-50 border border-indigo-100 p-2 rounded-xl text-center">
+                                                <Mountain size={12} className="mx-auto mb-1 text-indigo-500" />
+                                                <p className="text-[8px] uppercase font-bold text-indigo-400">Elevation</p>
+                                                <p className="text-[10px] font-black text-indigo-700">Flat</p>
+                                            </div>
+                                            <div className="bg-indigo-50 border border-indigo-100 p-2 rounded-xl text-center">
+                                                <Footprints size={12} className="mx-auto mb-1 text-indigo-500" />
+                                                <p className="text-[8px] uppercase font-bold text-indigo-400">Surface</p>
+                                                <p className="text-[10px] font-black text-indigo-700">Paved</p>
+                                            </div>
+                                            </div>
+                                        )}
+
+                                        {event.details ? (
+                                            <div className="bg-white border-2 border-blue-500 p-3 rounded-xl shadow-lg">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <div className="flex items-center gap-2">
+                                                {React.createElement(event.details.icon, { size: 16, className: "text-blue-500" })}
+                                                <p className="text-xs font-black uppercase text-blue-600">{event.details.title}</p>
+                                                </div>
+                                                <span className="text-[10px] bg-blue-100 text-blue-700 font-black px-2 py-0.5 rounded uppercase">{event.details.cost}</span>
+                                            </div>
+                                            <p className="text-xs text-gray-700 leading-relaxed font-medium mb-3">{event.details.content}</p>
+                                            {event.longDesc && <p className="text-[10px] text-gray-500 leading-relaxed italic border-t pt-2">{event.longDesc}</p>}
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                            <div className="grid grid-cols-2 gap-2">
+                                                <div className="bg-white border border-slate-200 p-2 rounded-lg text-center shadow-sm">
+                                                <p className="text-[8px] uppercase font-bold text-slate-400">Traveled</p>
+                                                <p className="text-xs font-black">{event.distPrev} mi</p>
+                                                </div>
+                                                <div className="bg-white border border-slate-200 p-2 rounded-lg text-center shadow-sm">
+                                                <p className="text-[8px] uppercase font-bold text-slate-400">Duration</p>
+                                                <p className="text-xs font-black">{event.duration === 720 ? "Overnight" : `${event.duration} m`}</p>
+                                                </div>
+                                                {event.distNext > 0 && (
+                                                <div className={`p-2.5 rounded-xl col-span-2 flex items-center justify-between px-3 shadow-lg ${isRisky ? 'bg-red-900 text-white' : 'bg-slate-900 text-white'}`}>
+                                                    <div className="flex items-center gap-2">
+                                                    {isRisky ? <ZapOff size={12} className="text-amber-400" /> : <ArrowRightLeft size={12} className="text-blue-400" />}
+                                                    <p className="text-[9px] uppercase font-bold opacity-80 tracking-widest">{isRisky ? 'MAX RANGE LEG' : 'Next Leg'}</p>
+                                                    </div>
+                                                    <p className="text-[10px] font-black">{event.distNext} mi / {event.timeToNext}</p>
+                                                </div>
+                                                )}
+                                            </div>
+                                            {event.longDesc && (
+                                                <div className="bg-white border border-slate-200 p-3 rounded-xl shadow-sm">
+                                                <p className="text-[10px] text-gray-600 leading-relaxed font-medium italic">{event.longDesc}</p>
+                                                </div>
+                                            )}
+                                            </div>
+                                        )}
+                                        </div>
+                                    )}
+                                    </div>
+                                </div>
+                                );
+                            })}
+                            </div>
+                        </div>
+                        ))}
+                    </div>
+                    )}
+
+                    {activeTab === 'tax' && (
+                    <div className="space-y-4">
+                        <div className="bg-blue-700 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12"><DollarSign size={100}/></div>
+                        <p className="text-[10px] uppercase font-black tracking-widest opacity-80">A&S Sealcoating Business Est.</p>
+                        <h2 className="text-4xl font-black mt-1">${totalTaxDeduction.toFixed(2)}</h2>
+                        <div className="mt-4 flex gap-2">
+                        <span className="text-[10px] bg-white/20 px-2 py-1 rounded font-bold uppercase tracking-tight italic border border-white/20">IRS COMPLIANT 2026</span>
+                        </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="p-4 border-b border-gray-50 flex justify-between items-center">
+                        <h3 className="font-bold text-gray-800 uppercase tracking-tighter">Full Expense Breakdown</h3>
+                        <Receipt size={16} className="text-blue-500" />
+                        </div>
+                        <div className="divide-y divide-gray-50">
+                        {moneyBreakdown.map((row) => (
+                            <div key={row.id} onClick={() => toggleMoney(row.id)} className="p-4 hover:bg-gray-50 transition-all cursor-pointer">
+                            <div className="flex justify-between items-start mb-2">
+                                <div>
+                                <div className="flex items-center gap-2">
+                                    <p className="text-sm font-black text-gray-800 uppercase italic leading-none">{row.item}</p>
+                                    {expandedMoney === row.id ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
+                                </div>
+                                <p className="text-[10px] text-gray-400 font-bold uppercase mt-1">{row.cost}</p>
+                                </div>
+                                <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
+                                row.status === 'Personal' ? 'bg-red-50 text-red-600' : row.status === 'Expense' ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-700'
+                                }`}>
+                                {row.status}
+                                </span>
+                            </div>
+                            {expandedMoney === row.id && (
+                                <div className="mt-3 bg-blue-50 p-3 rounded-xl border border-blue-100 animate-in slide-in-from-top-1">
+                                <p className="text-[11px] font-bold uppercase text-blue-700 mb-1">{row.reason}</p>
+                                <p className="text-[11px] text-blue-900 leading-relaxed italic">{row.longDesc}</p>
+                                </div>
+                            )}
+                            </div>
+                        ))}
+                        </div>
+                        </div>
+                    </div>
+                    )}
+
+                    {activeTab === 'events' && (
+                    <div className="space-y-4 pb-12">
+                        <h2 className="text-xl font-black text-gray-900 px-1 uppercase italic tracking-tighter">Event Cards</h2>
+                        <div className="grid grid-cols-1 gap-4">
+                        {funEvents.map((event) => {
+                            return (
+                            <div key={event.id} onClick={() => setExpandedEvent(expandedEvent === event.id ? null : event.id)} className={`relative rounded-3xl overflow-hidden transition-all duration-300 shadow-md cursor-pointer border ${expandedEvent === event.id ? 'scale-105 z-10' : 'scale-100'}`}>
+                                <div className={`bg-gradient-to-br ${event.color} p-5 text-white`}>
+                                <div className="flex justify-between items-start">
+                                <div className="flex items-center gap-4">
+                                    <div className="bg-white/20 p-3 rounded-2xl backdrop-blur-md">
+                                    {renderIcon(event.icon, { size: 24 })}
+                                    </div>
+                                    <div>
+                                    <p className="font-black text-lg uppercase italic leading-none tracking-tighter">{event.title}</p>
+                                    <p className="text-[10px] font-bold uppercase opacity-80 mt-1">{event.time} • {event.cost}</p>
+                                    </div>
+                                </div>
+                                {expandedEvent === event.id ? <ChevronUp size={20}/> : <ChevronDown size={20}/>}
+                                </div>
+                                {expandedEvent === event.id && (
+                                <div className="mt-4 animate-in slide-in-from-top-4 duration-300">
+                                    <div className="bg-black/20 p-4 rounded-2xl backdrop-blur-md border border-white/10">
+                                        <p className="text-xs font-medium leading-relaxed mb-4">{event.longDesc}</p>
+                                        <div className="flex justify-between items-center pt-3 border-t border-white/20">
+                                        <span className="text-[10px] font-black uppercase opacity-60">Ticket Info</span>
+                                        <span className="text-sm font-black text-white">{event.cost}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                )}
+                                </div>
+                            </div>
+                            );
+                        })}
+                        </div>
+                    </div>
+                    )}
+                </div>
+
+                {/* Bottom Nav */}
+                <div className="bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 max-w-md mx-auto shadow-2xl flex px-4 pb-6 pt-2 z-50 rounded-t-3xl shrink-0">
+                    <TabButton id="itinerary" icon={Navigation} label="Route" />
+                    <TabButton id="events" icon={PartyPopper} label="Fun" />
+                    <TabButton id="tax" icon={Receipt} label="Money" />
+                </div>
+                </div>
+            );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
