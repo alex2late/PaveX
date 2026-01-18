@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pave X Express 2026</title>
+    <title>PAVE X 2026</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -54,7 +54,8 @@
             PartyPopper, Mic2, ChevronDown, ChevronUp, DollarSign, Briefcase, 
             AlertTriangle, TrendingUp, Coffee, Warehouse, ZapOff, Gauge, 
             ParkingCircle, Map as MapIcon, Timer, ShoppingBag, Award, Activity, 
-            Mountain, Footprints, Camera, Image as ImageIcon
+            Mountain, Footprints, Camera, Image as ImageIcon, Home, Guitar,
+            Flame
         } from 'lucide-react';
 
         const App = () => {
@@ -64,28 +65,32 @@
             const [expandedEvent, setExpandedEvent] = useState(null);
             const [expandedMoney, setExpandedMoney] = useState(null);
             
-            const tripMileage = 1430; 
+            const tripMileage = 1605; // Added return trip miles
             const rateMachE = 0.17;
             const rateCamaro = 0.18;
             const irsStandardRate = 0.70;
 
             const tripData = {
-                title: "Pave X Express 2026",
+                title: "PAVE X 2026",
                 route: "New Albany → NOLA → Nashville",
                 dates: "Feb 7 - Feb 12, 2026",
                 costs: {
                     hotelNOLA: 125,
                     hotelNights: 4, 
+                    hotelNashville: 160,
                     concert: 92,
                     nba: 45,
                     paveX: 595,
+                    foodEst: 400,
                     drivingCost: carType === 'camaro' ? (tripMileage * rateCamaro).toFixed(2) : (tripMileage * rateMachE).toFixed(2),
                     mileageDeduction: (tripMileage * irsStandardRate).toFixed(2)
                 }
             };
 
-            const totalHotelCost = tripData.costs.hotelNOLA * tripData.costs.hotelNights;
-            const totalTaxDeduction = parseFloat(totalHotelCost.toString()) + parseFloat(tripData.costs.mileageDeduction) + tripData.costs.paveX;
+            const totalHotelCost = (tripData.costs.hotelNOLA * tripData.costs.hotelNights) + tripData.costs.hotelNashville;
+            // 50% of food is deductible
+            const foodDeduction = tripData.costs.foodEst * 0.5;
+            const totalTaxDeduction = parseFloat(totalHotelCost.toString()) + parseFloat(tripData.costs.mileageDeduction) + tripData.costs.paveX + foodDeduction;
 
             const getMapUrl = (location, prevLocation = null, isTrail = false, isParade = false) => {
                 const zoom = prevLocation ? 6 : (isTrail || isParade ? 16 : 15);
@@ -123,7 +128,7 @@
                             time: "5:30 AM", 
                             title: "Wheels Up", location: "New Albany, IN", type: "travel",
                             distPrev: 0, distNext: carType === 'mache' ? 105 : 175, duration: 0, timeToNext: carType === 'mache' ? "1h 40m" : "2h 45m",
-                            longDesc: "The 2026 Pave X journey begins at dawn. We are departing at 5:30 AM to ensure we clear the Louisville and Nashville morning corridors before the Saturday rush. This early start is designed to get us into New Orleans by late afternoon, allowing time to check into the Hampton Inn and grab a celebratory dinner in the Warehouse District."
+                            longDesc: "The 2026 Pave X journey begins at dawn. Departing early to clear the Louisville and Nashville morning corridors. Arrival in NOLA is expected by late afternoon."
                         },
                         { 
                             id: "sat-stop1",
@@ -133,9 +138,7 @@
                             type: "logistics",
                             prevLocation: "New Albany, IN",
                             distPrev: carType === 'mache' ? 105 : 175, distNext: carType === 'mache' ? 185 : 85, duration: 40, timeToNext: "1h 20m",
-                            longDesc: carType === 'camaro' 
-                                ? "Tactical Reset: 175 miles in. We hit the Nashville Kroger early to utilize high-value fuel points and top off the tank. This ensures a full 320-mile range as we enter Alabama. Grab a large coffee here; the next leg into Hartselle is quick, but it's our last Kroger stop for a long while."
-                                : "EV Hub #1: Smiths Grove Buc-ee's is perfectly positioned at 105 miles. This stop is essential for its high-output Level 3 chargers. We'll reach 90% charge while grabbing a breakfast taco, preparing for the 185-mile push through central Kentucky and into northern Alabama."
+                            longDesc: "Tactical Reset: Nashville Kroger allows for fuel points. Smiths Grove Buc-ee's offers high-output Level 3 chargers and breakfast brisket tacos."
                         },
                         { 
                             id: "sat-stop2",
@@ -145,7 +148,7 @@
                             prevLocation: carType === 'mache' ? "Smiths Grove, KY" : "Nashville, TN",
                             type: "logistics",
                             distPrev: carType === 'mache' ? 185 : 85, distNext: carType === 'mache' ? 191 : 310, duration: 40, timeToNext: carType === 'camaro' ? "4h 30m" : "2h 45m",
-                            longDesc: carType === 'camaro'
+                            longDesc: carType === 'camaro' 
                                 ? "MEGA LEG START: Filling at Hartselle Kroger sets up a 310-mile push to Robertsdale. This pushes the 320-mile SS tank to the limit. Manage throttle carefully!" 
                                 : "Athens Buc-ee's staging. Critical 191-mile leg ahead to Hope Hull. Reach full charge to handle elevation and highway drain."
                         },
@@ -163,11 +166,11 @@
                         },
                         { 
                             id: "sat-arrival",
-                            time: carType === 'mache' ? "5:00 PM" : "5:15 PM", title: "Arrive NOLA Hotel", location: "Convention Center Blvd, New Orleans", 
+                            time: carType === 'mache' ? "5:00 PM" : "5:15 PM", title: "Arrive NOLA Hotel", location: "Hampton Inn Convention Ctr", 
                             prevLocation: carType === 'mache' ? "Hope Hull, AL" : "Robertsdale, AL",
                             type: "logistics",
                             distPrev: carType === 'mache' ? 150 : 144, distNext: 0, duration: 0, timeToNext: "0m",
-                            longDesc: "Welcome to NOLA Central Time. Staying all 4 nights at the Hampton Inn & Suites Convention Center. Historic warehouse district, walkable to everything."
+                            longDesc: "Final Destination: Hampton Inn & Suites New Orleans Convention Center. Directly across from the Pave X venue. Park the car and relax."
                         }
                     ]
                 },
@@ -195,43 +198,45 @@
                 },
                 {
                     day: "Monday, Feb 9",
-                    title: "Pave X Launch & NBA",
+                    title: "Workshops & Kickoff",
                     events: [
                         { 
-                            id: "mon-round", time: "8:00 AM", title: "Roundtable Discussions", location: "New Orleans Convention Center", type: "business", 
-                            details: { title: "Contractor Roundtables", content: "Peer sharing on crack-sealing and crew logistics. Essential networking with owners to prepare for 2026.", icon: Briefcase, cost: "Included" }
+                            id: "mon-round", time: "3:00 PM", title: "Pre-Con Roundtables", location: "Convention Center", type: "business", 
+                            details: { title: "Roundtables", content: "Topics: Paving | Striping | Sweeping | Pavement Maintenance | Sealcoating | Business Mgmt | Technology.", icon: Briefcase, cost: "Included" },
+                            longDesc: "Contractor Roundtables are peer-to-peer sharing sessions. You will be seated with other professionals to discuss specific challenges in: Paving, Striping, Sealcoating, and Business Management."
                         },
                         { 
-                            id: "mon-trade", time: "10:00 AM", title: "Trade Show Expo Opens", location: "Exhibit Hall", type: "business", 
-                            details: { title: "Trade Show Floor", content: "200,000 sq ft of equipment. Focus on new sealcoating spray bars and high-efficiency melting kettles.", icon: TrendingUp, cost: "Included" }
-                        },
-                        { 
-                            id: "mon-kickoff", time: "4:00 PM", title: "Official Kickoff Party", location: "Convention Center Lot", type: "business", 
-                            details: { title: "Kickoff Celebration", content: "Networking, live music, and catering. Meet Pave X speakers and executives informally.", icon: PartyPopper, cost: "Included" }
+                            id: "mon-kickoff", time: "6:00 PM", title: "Kickoff Party @ Fulton", location: "600 Fulton Street", type: "business", 
+                            details: { title: "Kickoff at Fulton Alley", content: "Networking, bowling, and drinks at Fulton Alley. 6:00 PM – 9:00 PM.", icon: PartyPopper, cost: "Included" },
+                            longDesc: "Located at Fulton Alley (600 Fulton St). A luxury boutique bowling alley and bar. It's a short walk from the Convention Center. NOTE: This overlaps with the start of the Pelicans game (7PM), but it's very close to the arena for a pre-game stop."
                         },
                         { 
                             id: "nba",
-                            time: "7:00 PM", title: "Pelicans vs. Kings", location: "Smoothie King Center, New Orleans", type: "sports",
-                            details: { title: "NBA: Pelicans vs Kings", content: "Watch Zion. Target Upper Section Front Row for broadcast-style view. 15 min walk from Warehouse District.", icon: Ticket, cost: "$45 avg" }
+                            time: "7:00 PM", title: "Pelicans vs. Kings", location: "Smoothie King Center", type: "sports",
+                            details: { title: "NBA: Pelicans vs Kings", content: "Watch Zion. Target Upper Section Front Row for broadcast-style view. 10 min walk from Fulton Alley.", icon: Ticket, cost: "$45 avg" }
                         }
                     ]
                 },
                 {
                     day: "Tuesday, Feb 10",
-                    title: "Brad Lea & Awards Night",
+                    title: "Expo, Keynote & Awards",
                     events: [
                         { 
                             id: "bradlea",
-                            time: "10:00 AM", title: "Brad Lea Keynote", location: "Main Stage", type: "business",
-                            details: { title: "Brad Lea: Unstoppable", content: "CEO of Lightspeed VT. Keynote on sales mindset and automated systems to scale your sealcoating business.", icon: User, cost: "Free" }
+                            time: "1:30 PM", title: "Keynote: Brad Lea", location: "Main Stage", type: "business",
+                            details: { title: "Building An Unstoppable Mindset", content: "Speaker: Brad Lea. 1:30 PM - 3:00 PM. FREE Entry with ANY PAVE/X Badge.", icon: User, cost: "Free" }
                         },
                         { 
-                            id: "tue-reception", time: "5:00 PM", title: "Networking Reception", location: "Convention Center", type: "business", 
-                            longDesc: "Final networking session on the trade show floor. Sponsored drinks and apps—prime time to close equipment deals."
+                            id: "tue-expo", time: "3:00 PM", title: "Trade Show Floor Open", location: "Exhibit Hall", type: "business", 
+                            longDesc: "3:00 PM – 7:00 PM. The floor opens immediately following the Keynote. This is the main event to see new equipment, sprayers, and striping tech."
                         },
                         { 
-                            id: "tue-awards", time: "6:00 PM", title: "Pavement Awards Ceremony", location: "Convention Center Ballroom", type: "business", 
-                            details: { title: "Pavement Awards", content: "Industry 'Oscars.' Benchmarking A&S work against the top 1% of firms nationwide. Excellence in striping and paving.", icon: Award, cost: "Included" }
+                            id: "tue-reception", time: "5:00 PM", title: "Networking Reception", location: "Trade Show Floor", type: "business", 
+                            longDesc: "5:00 PM – 7:00 PM. Located directly on the Trade Show Floor. Grab a drink and network with vendors while checking out the equipment."
+                        },
+                        { 
+                            id: "tue-awards", time: "6:00 PM", title: "Pavement Awards", location: "Trade Show Floor", type: "business", 
+                            details: { title: "Pavement Awards Ceremony", content: "6:00 PM – 7:00 PM. Located on the Trade Show Floor. Honoring the industry's best projects.", icon: Award, cost: "Included" }
                         },
                         { id: "tuesdinner", time: "8:00 PM", title: "Commander's Palace Dinner", location: "1403 Washington Ave, New Orleans", type: "leisure",
                             details: { title: "Garden District Dining", content: "Historic landmark defined by refined Creole cuisine. 25-cent martinis and world-class hospitality since 1893.", icon: Utensils, cost: "$100/pp" }
@@ -240,10 +245,10 @@
                 },
                 {
                     day: "Wednesday, Feb 11",
-                    title: "The Nashville Sprint (536 Mi)",
+                    title: "Nashville Concert Sprint",
                     events: [
                         { id: "wed-start", time: carType === 'mache' ? "7:30 AM" : "8:00 AM", title: "Depart NOLA", location: "Convention Center Blvd, NOLA", type: "travel", distPrev: 0, distNext: 132, duration: 0, timeToNext: "2h 00m",
-                        longDesc: "Heading North. The return sprint to Nashville is a 536-mile calculated move to make the 7:00 PM Opry show. The Mach-E starts at 7:30 AM to build its charging buffer for the Alabama incline legs."
+                        longDesc: "Heading North. The return sprint to Nashville. We need to reach the hotel by late afternoon to freshen up for the Opry."
                         },
                         { 
                             id: "wed-fuel1",
@@ -266,8 +271,39 @@
                         { 
                             id: "concert",
                             time: "7:00 PM", title: "Conservation Aid Concert", location: "2804 Opryland Dr, Nashville", prevLocation: carType === 'camaro' ? "Hartselle, AL" : "Hope Hull, AL", type: "event",
-                            details: { title: "Conservation Aid 2026", content: "A special songwriters round featuring Thomas Rhett and Dustin Lynch. Intimate storyteller format at the Grand Ole Opry.", icon: Mic2, cost: "$92" },
-                            longDesc: "The Grand Finale. An intimate night at the legendary Grand Ole Opry. Thomas Rhett and Dustin Lynch share the stage in a storytelling format. This is the perfect way to close out the Pave X business trip before the final drive home."
+                            details: { title: "Conservation Aid 2026", content: "A special songwriters round featuring Thomas Rhett and Dustin Lynch. Intimate storyteller format at the Grand Ole Opry.", icon: Guitar, cost: "$92" },
+                            longDesc: "The Grand Finale. An intimate night at the legendary Grand Ole Opry. Thomas Rhett and Dustin Lynch share the stage in a storytelling format, raising money for the National Wild Turkey Federation."
+                        },
+                        {
+                            id: "wed-hotel",
+                            time: "10:00 PM", title: "Check-in Nashville", location: "Hampton Inn & Suites Nashville at Opryland", type: "logistics",
+                            distPrev: 10, distNext: 0, duration: 0, timeToNext: "0m",
+                            longDesc: "Staying north of the venue to avoid downtown traffic. The Hampton Inn at Opryland puts us right next to the highway for an easy exit Thursday morning."
+                        }
+                    ]
+                },
+                {
+                    day: "Thursday, Feb 12",
+                    title: "The Home Stretch",
+                    events: [
+                        { id: "thu-start", time: "9:00 AM", title: "Depart Nashville", location: "Hampton Inn Opryland", type: "travel", distPrev: 0, distNext: 65, duration: 0, timeToNext: "1h 00m" },
+                        { 
+                            id: "thu-stop1",
+                            time: "10:30 AM", 
+                            title: carType === 'mache' ? "Buc-ee's Smiths Grove" : "Home Run", 
+                            location: carType === 'mache' ? "Smiths Grove, KY" : "New Albany, IN", 
+                            type: carType === 'mache' ? "logistics" : "travel",
+                            distPrev: 65, distNext: carType === 'mache' ? 100 : 0, duration: carType === 'mache' ? 30 : 0, timeToNext: "1h 30m",
+                            longDesc: carType === 'mache' 
+                                ? "Final Mach-E charge. Buc-ee's Smiths Grove ensures you arrive in New Albany with enough battery to run errands for the rest of the week." 
+                                : "The Camaro SS cruises straight through. No stops needed after the Hartselle top-off on Wednesday."
+                        },
+                        { 
+                            id: "thu-home",
+                            time: carType === 'mache' ? "1:00 PM" : "12:00 PM", 
+                            title: "Arrive Home", location: "New Albany, IN", type: "travel",
+                            distPrev: carType === 'mache' ? 100 : 165, distNext: 0, duration: 0, timeToNext: "0m",
+                            longDesc: "Trip Complete. Back in New Albany ready for the 2026 paving season."
                         }
                     ]
                 }
@@ -275,16 +311,20 @@
 
             const moneyBreakdown = [
                 { id: "tax-pavex", item: "Pave X Registration", cost: `$${tripData.costs.paveX}`, status: "Deduction", reason: "Direct industry training.", longDesc: "100% deductible as a business expense. Pave X is a professional trade show directly related to A&S Sealcoating operations. The IRS allows full deduction for professional development events including registration fees for both owners." },
-                { id: "tax-hotel", item: "NOLA Hotel (4 Nights)", cost: `$${totalHotelCost.toFixed(2)}`, status: "Deduction", reason: "Business Lodging.", longDesc: "Lodging is 100% deductible when the primary purpose of the travel is professional. Since you are in NOLA specifically for the Pave X schedule, all 4 nights at the Hampton Inn are allowable deductions under current business travel provisions. We've shifted from Slidell to maximize business presence and networking availability." },
-                { id: "tax-mileage", item: `Mileage Deduction`, cost: `~$${tripData.costs.mileageDeduction}`, status: "Deduction", reason: "IRS Standard Rate.", longDesc: `The IRS standard rate (~70¢/mi) accounts for the total cost of ownership including fuel, maintenance, and depreciation. For this 1,430-mile trip, the deduction is ~$${tripData.costs.mileageDeduction}, which is almost 4x your actual out-of-pocket fuel/charge costs.` },
-                { id: "tax-fuel", item: "Actual Driving Cost", cost: `$${tripData.costs.drivingCost}`, status: "Expense", reason: carType === 'camaro' ? "$0.18/mi" : "$0.17/mi", longDesc: "Out-of-pocket spend for fuel or high-speed charging. Vital for cash flow tracking at A&S." }
+                { id: "tax-hotel", item: "Hotels (NOLA + Nash)", cost: `$${totalHotelCost.toFixed(2)}`, status: "Deduction", reason: "Business Lodging.", longDesc: "Lodging is 100% deductible when the primary purpose of the travel is professional. Includes 4 nights in NOLA and 1 night in Nashville as part of the return travel." },
+                { id: "tax-mileage", item: `Mileage Deduction`, cost: `~$${tripData.costs.mileageDeduction}`, status: "Deduction", reason: "IRS Standard Rate.", longDesc: `The IRS standard rate (~70¢/mi) accounts for the total cost of ownership including fuel, maintenance, and depreciation. For this 1,605-mile trip, the deduction is ~$${tripData.costs.mileageDeduction}, which is almost 4x your actual out-of-pocket fuel/charge costs.` },
+                { id: "tax-food", item: "Meals & Dining", cost: `~$${tripData.costs.foodEst}`, status: "50% Deductible", reason: "Business Meals.", longDesc: "Meals incurred while traveling for business are 50% deductible. This includes your dinners at Commander's Palace and lunch stops. Keep receipts!" },
+                { id: "tax-fuel", item: "Actual Driving Cost", cost: `$${tripData.costs.drivingCost}`, status: "Expense", reason: carType === 'camaro' ? "$0.18/mi" : "$0.17/mi", longDesc: "Out-of-pocket spend for fuel or high-speed charging. Vital for cash flow tracking at A&S, but you typically take the Standard Mileage Deduction instead of this actual cost on your taxes." },
+                { id: "tax-nba", item: "NBA Tickets", cost: `$${tripData.costs.nba * 2}`, status: "Personal", reason: "Entertainment Rule.", longDesc: "Under current tax law (TCJA), most entertainment expenses are non-deductible. Even if business is discussed during the Pelicans game, the IRS views this as personal recreation for tax purposes." },
+                { id: "tax-concert", item: "Concert Tickets", cost: `$${tripData.costs.concert * 2}`, status: "Personal", reason: "Entertainment Rule.", longDesc: "Considered personal recreation. It's an amazing finale to the trip, but we'll keep this out of the business column to ensure our A&S tax records are audit-proof. Charity status (Conservation Aid) may change personal tax status, but not business deduction status." },
             ];
 
             const funEvents = [
-                { id: "barkus", title: "Barkus Dog Parade", time: "Sun 2 PM", icon: Dog, desc: "Costumed pups on Royal Street.", cost: "Free", color: "from-orange-400 to-red-500", longDesc: "Experience the unique 'walking parade' culture of New Orleans. Hundreds of costumed dogs lead their humans through the historic French Quarter. It's a massive neighborhood party that showcases the city's vibrant local spirit and community pride. Perfect for soaking in the energy before the work week begins." },
-                { id: "nba", title: "Pelicans vs Kings", time: "Mon 7 PM", icon: Ticket, desc: "NBA Home Game.", cost: "$45", color: "from-blue-600 to-indigo-700", longDesc: "Catch Zion Williamson and the Pels at the Smoothie King Center. We've mapped the best value seats—front row of the upper bowl. You get an unrestricted view of the whole tactical play for less than $50 per seat. Only a short 15-minute walk through the Warehouse District from our hotel." },
-                { id: "bradlea", title: "Brad Lea Keynote", time: "Tue 10 AM", icon: User, desc: "Scaling & Sales Bio.", cost: "Badge", color: "from-amber-400 to-orange-600", longDesc: "Master closer Brad Lea shares the mindset for massive growth. Free educational event for attendees." },
-                { id: "concert", title: "Conservation Aid", time: "Wed 7 PM", icon: Music, desc: "Grand Ole Opry Live.", cost: "$92", color: "from-purple-600 to-pink-600", longDesc: "Acoustic songwriter round with Thomas Rhett and Dustin Lynch at the Grand Ole Opry." }
+                { id: "barkus", title: "Barkus Dog Parade", time: "Sun 2 PM", icon: Dog, desc: "Costumed pups on Royal Street.", cost: "Free", color: "from-orange-400 to-red-500", longDesc: "NOLA's premier dog parade! Hundreds of dogs in 'Wicked' costumes lead owners through the Quarter. The atmosphere is electric but family-friendly. It's a visual spectacle of creativity and local spirit." },
+                { id: "nba", title: "Pelicans vs Kings", time: "Mon 7 PM", icon: Ticket, desc: "NBA Home Game.", cost: "$45", color: "from-blue-600 to-indigo-700", longDesc: "Watch Zion at the Smoothie King Center. Target front-row upper section seats for the best view. The arena energy in NOLA is unique—expect brass bands in the stands and a high-energy crowd." },
+                { id: "bradlea", title: "Brad Lea Keynote", time: "Tue 1:30 PM", icon: User, desc: "Scaling & Sales Bio.", cost: "Badge", color: "from-amber-400 to-orange-600", longDesc: "Master closer Brad Lea shares the mindset for massive growth. Known for his 'Dropping Bombs' podcast, Brad focuses on 'Real World' sales strategies that apply directly to blue-collar service businesses like sealcoating." },
+                { id: "dinner", title: "Commander's Palace", time: "Tue 8 PM", icon: Utensils, desc: "Haute Creole Dining Landmark.", cost: "$100/pp", color: "from-teal-500 to-emerald-700", longDesc: "The crown jewel of New Orleans dining since 1893. Located in the heart of the Garden District, this blue-and-white Victorian landmark is famous for its award-winning Haute Creole cuisine and whimsical charm. We'll be dining in a room that has hosted presidents and celebrities. Don't miss the Turtle Soup or the legendary Bread Pudding Soufflé (must be ordered in advance!). A jacket is preferred for gentlemen. It's the ultimate way to celebrate a successful business trip before heading north." },
+                { id: "concert", title: "Conservation Aid", time: "Wed 7 PM", icon: Guitar, desc: "Grand Ole Opry Live.", cost: "$92", color: "from-purple-600 to-pink-600", longDesc: "This isn't your typical stadium concert. The 'Songwriters Round' format at the Grand Ole Opry is a Nashville tradition where artists sit in a semi-circle with their guitars and swap stories. You'll hear Thomas Rhett, Dustin Lynch, and Rhett Akins strip back the production and play their massive radio hits exactly how they were written. It’s intimate, funny, and incredibly moving. The acoustics in the Opry House are legendary. Plus, it supports the National Wild Turkey Federation, combining great music with a great cause." , setList: ["Die A Happy Man - Thomas Rhett", "Marry Me - Thomas Rhett", "Life Changes - Thomas Rhett", "Small Town Boy - Dustin Lynch", "Cowboys and Angels - Dustin Lynch", "Thinking 'Bout You - Dustin Lynch", "Honey Bee (Writer) - Rhett Akins", "Boys 'Round Here (Writer) - Rhett Akins", "That Ain't My Truck - Rhett Akins"]}
             ];
 
             const fuelStats = [
@@ -300,39 +340,51 @@
                 <div className="bg-gray-100 flex-1 w-full overflow-hidden flex flex-col h-full sm:rounded-3xl">
                 {/* Header */}
                 <div className="bg-slate-950 text-white p-6 relative overflow-hidden shrink-0">
-                    <div className="absolute top-0 right-0 p-8 opacity-10">
-                    {carType === 'camaro' ? renderIcon(Fuel, { size: 120 }) : renderIcon(Zap, { size: 120 })}
-                    </div>
-                    <div className="flex justify-between items-start relative z-10">
-                    <div>
-                        <h1 className="text-2xl font-black tracking-tight italic uppercase leading-none">Pave X Express</h1>
-                        <p className="text-slate-400 text-[10px] font-bold flex items-center gap-1 mt-2 uppercase tracking-tighter">
-                        <Navigation size={10} /> {tripData.route}
-                        </p>
-                    </div>
-                    <button 
-                        onClick={() => setCarType(carType === 'camaro' ? 'mache' : 'camaro')}
-                        className={`p-2 rounded-xl border flex flex-col items-center transition-all active:scale-95 ${
-                            carType === 'camaro' 
-                            ? 'bg-amber-500 border-amber-400 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]' 
-                            : 'bg-blue-600 border-blue-500 text-white shadow-[0_0_20px_rgba(37,99,235,0.4)]'
-                        }`}
-                    >
-                        <Car size={20} />
-                        <span className="text-[10px] font-black mt-1 uppercase">
-                        {carType === 'camaro' ? 'SS/V8' : 'MACH-E'}
-                        </span>
-                    </button>
+                    {/* Background Texture/Gradient */}
+                    <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${carType === 'camaro' ? 'from-amber-600/30 to-orange-900/30' : 'from-blue-600/30 to-indigo-900/30'}`}></div>
+                    <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
+                        {carType === 'camaro' ? renderIcon(Flame, { size: 140 }) : renderIcon(Zap, { size: 140 })}
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 mt-6">
+                    <div className="flex justify-between items-center relative z-10 mb-6">
+                        <div>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">A&S Sealcoating Trip</p>
+                            <h1 className="text-3xl font-black tracking-tight italic uppercase leading-none">PAVE X 2026</h1>
+                            <div className="flex items-center gap-1 mt-1 text-slate-300">
+                                <MapIcon size={12} />
+                                <p className="text-[10px] font-bold uppercase tracking-wider">{tripData.route}</p>
+                            </div>
+                        </div>
+                        
+                        {/* Vehicle Toggle Switch */}
+                        <div className="bg-slate-900 p-1 rounded-xl border border-slate-700 flex shadow-lg">
+                            <button 
+                                onClick={() => setCarType('camaro')}
+                                className={`px-3 py-2 rounded-lg flex flex-col items-center transition-all ${carType === 'camaro' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300'}`}
+                            >
+                                <Car size={18} />
+                                <span className="text-[8px] font-black uppercase mt-0.5">Camaro SS</span>
+                            </button>
+                            <button 
+                                onClick={() => setCarType('mache')}
+                                className={`px-3 py-2 rounded-lg flex flex-col items-center transition-all ${carType === 'mache' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300'}`}
+                            >
+                                <Zap size={18} />
+                                <span className="text-[8px] font-black uppercase mt-0.5">Mach-E</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3 relative z-10">
                     {fuelStats.map((stat, i) => {
                         const Icon = stat.icon;
                         return (
-                        <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2 text-center">
-                            {renderIcon(stat.icon, { size: 14, className: "mx-auto mb-1 text-slate-400" })}
-                            <p className="text-[9px] opacity-60 leading-none uppercase font-bold">{stat.label}</p>
-                            <p className="text-xs font-black mt-1 tracking-tight">{stat.value}</p>
+                        <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2 text-center backdrop-blur-sm">
+                            <div className={`mx-auto mb-1 ${carType === 'camaro' ? 'text-amber-500' : 'text-blue-400'}`}>
+                                {renderIcon(stat.icon, { size: 16 })}
+                            </div>
+                            <p className="text-[8px] opacity-60 leading-none uppercase font-bold tracking-wider">{stat.label}</p>
+                            <p className="text-sm font-black mt-0.5 tracking-tight">{stat.value}</p>
                         </div>
                         );
                     })}
@@ -344,23 +396,23 @@
                     
                     {activeTab === 'itinerary' && (
                     <div className="space-y-4">
-                        <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 flex items-center gap-3">
-                        <MapIcon size={16} className="text-blue-500 shrink-0" />
-                        <p className="text-[10px] text-blue-700 font-black leading-tight uppercase tracking-tighter">
-                            Map Zoom Level Calibrated: Wide-angle view for long legs enabled.
-                        </p>
+                        <div className={`p-3 rounded-xl border flex items-center gap-3 shadow-sm ${carType === 'camaro' ? 'bg-amber-50 border-amber-100' : 'bg-blue-50 border-blue-100'}`}>
+                            <MapIcon size={16} className={carType === 'camaro' ? 'text-amber-600' : 'text-blue-600'} />
+                            <p className={`text-[10px] font-black leading-tight uppercase tracking-tighter ${carType === 'camaro' ? 'text-amber-800' : 'text-blue-800'}`}>
+                                {carType === 'camaro' ? 'Kroger Points & V8 Range Optimized' : 'High-Speed Charging Route Loaded'}
+                            </p>
                         </div>
 
                         {itinerary.map((day, idx) => (
                         <div key={idx} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                             <div className="bg-gray-50 p-3 border-b border-gray-100 flex justify-between items-center">
                             <h3 className="font-bold text-gray-800 text-xs flex items-center gap-2 uppercase tracking-tight">
-                                <Calendar size={12} className="text-blue-600" /> {day.day}
+                                <Calendar size={12} className="text-slate-500" /> {day.day}
                             </h3>
                             <span className={`text-[9px] px-2 py-0.5 rounded font-black uppercase tracking-tighter ${
-                                idx === 0 || idx === 4 ? 'bg-slate-200 text-slate-700' : 'bg-green-100 text-green-700'
+                                idx === 0 || idx === 5 ? 'bg-slate-200 text-slate-700' : 'bg-green-100 text-green-700'
                             }`}>
-                                {idx === 0 || idx === 4 ? "Travel" : "Pave X"}
+                                {idx === 0 || idx === 5 ? "Travel" : "Pave X"}
                             </span>
                             </div>
                             <div className="p-4 space-y-4">
@@ -368,6 +420,7 @@
                                 const IconComp = event.id === 'barkus' ? Dog :
                                             event.id === 'sun-run' ? Activity :
                                             event.id === 'tue-awards' ? Award :
+                                            event.id === 'thu-home' ? Home :
                                             event.type === 'business' ? Briefcase : 
                                             event.type === 'sports' ? Trophy : 
                                             event.type === 'travel' ? Car : Clock;
@@ -580,6 +633,7 @@
                         <h2 className="text-xl font-black text-gray-900 px-1 uppercase italic tracking-tighter">Event Cards</h2>
                         <div className="grid grid-cols-1 gap-4">
                         {funEvents.map((event) => {
+                            const Icon = event.icon;
                             return (
                             <div key={event.id} onClick={() => setExpandedEvent(expandedEvent === event.id ? null : event.id)} className={`relative rounded-3xl overflow-hidden transition-all duration-300 shadow-md cursor-pointer border ${expandedEvent === event.id ? 'scale-105 z-10' : 'scale-100'}`}>
                                 <div className={`bg-gradient-to-br ${event.color} p-5 text-white`}>
@@ -599,6 +653,22 @@
                                 <div className="mt-4 animate-in slide-in-from-top-4 duration-300">
                                     <div className="bg-black/20 p-4 rounded-2xl backdrop-blur-md border border-white/10">
                                         <p className="text-xs font-medium leading-relaxed mb-4">{event.longDesc}</p>
+                                        
+                                        {/* New Hit List Section */}
+                                        {event.setList && (
+                                            <div className="mb-4 pt-4 border-t border-white/10">
+                                                <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mb-2">Likely Setlist</p>
+                                                <div className="grid grid-cols-1 gap-1.5">
+                                                    {event.setList.map((song, i) => (
+                                                        <div key={i} className="flex items-center gap-2">
+                                                            <Music size={10} className="text-purple-300 opacity-70" />
+                                                            <span className="text-[10px] font-bold text-purple-100">{song}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
                                         <div className="flex justify-between items-center pt-3 border-t border-white/20">
                                         <span className="text-[10px] font-black uppercase opacity-60">Ticket Info</span>
                                         <span className="text-sm font-black text-white">{event.cost}</span>
