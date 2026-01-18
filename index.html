@@ -60,16 +60,17 @@
     <div id="root" class="w-full max-w-md h-[100dvh] bg-gray-50 flex flex-col relative overflow-hidden sm:h-[90vh] sm:rounded-3xl sm:border-8 sm:border-slate-800 sm:shadow-2xl"></div>
 
     <script type="text/babel" data-type="module">
-        import React, { useState, useMemo } from 'react';
+        import React, { useState, useMemo, useEffect } from 'react';
         import { createRoot } from 'react-dom/client';
         import { 
             Car, MapPin, Calendar, Music, Trophy, Receipt, ChevronRight, Dog, 
-            Info, Navigation, Clock, Fuel, Zap, 
+            Navigation, Clock, Fuel, Zap, 
             CheckCircle2, Utensils, Hotel, ArrowRightLeft, User, Ticket, Star, 
             PartyPopper, Mic2, ChevronDown, ChevronUp, DollarSign, Briefcase, 
             AlertTriangle, TrendingUp, Warehouse, ZapOff, Gauge, 
             Map as MapIcon, Award, Activity, 
-            Mountain, Footprints, Camera, Home, Guitar, CheckSquare, Sun, CloudRain, CloudSun
+            Mountain, Footprints, Camera, Home, Guitar, CheckSquare, Sun, CloudRain, CloudSun,
+            Landmark, Wallet, Calculator, Flag, Share2, Copy, ExternalLink, Timer, Globe
         } from 'lucide-react';
 
         const App = () => {
@@ -78,6 +79,7 @@
             const [expandedStop, setExpandedStop] = useState(null); 
             const [expandedEvent, setExpandedEvent] = useState(null);
             const [expandedMoney, setExpandedMoney] = useState(null);
+            const [daysUntil, setDaysUntil] = useState(0);
 
             // THEME ENGINE
             const theme = useMemo(() => {
@@ -89,7 +91,8 @@
                     bg: 'bg-amber-50',
                     border: 'border-amber-200',
                     text: 'text-amber-700',
-                    icon: Fuel
+                    icon: Fuel,
+                    carName: "Camaro SS"
                 } : {
                     primary: 'blue',
                     secondary: 'cyan',
@@ -98,9 +101,18 @@
                     bg: 'bg-blue-50',
                     border: 'border-blue-200',
                     text: 'text-blue-700',
-                    icon: Zap
+                    icon: Zap,
+                    carName: "Mach-E GT"
                 };
             }, [carType]);
+
+            useEffect(() => {
+                const targetDate = new Date('2026-02-07T05:30:00');
+                const now = new Date();
+                const diffTime = Math.abs(targetDate - now);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                setDaysUntil(diffDays);
+            }, []);
 
             const tripMileage = 1605;
             const rateMachE = 0.17;
@@ -122,9 +134,62 @@
             const totalHotelCost = (tripData.costs.hotelNOLA * tripData.costs.hotelNights) + tripData.costs.hotelNashville;
             const totalTaxDeduction = parseFloat(totalHotelCost) + parseFloat(tripData.costs.mileageDeduction) + tripData.costs.paveX + (tripData.costs.foodEst * 0.5);
 
-            // Opens native maps app
+            // Map Generator
+            const getMapUrl = (location, prevLocation = null) => {
+                const zoom = prevLocation ? 6 : 15;
+                if (prevLocation) {
+                    return `https://maps.google.com/maps?saddr=${encodeURIComponent(prevLocation)}&daddr=${encodeURIComponent(location)}&t=m&z=${zoom}&ie=UTF8&iwloc=&output=embed`;
+                }
+                return `https://maps.google.com/maps?q=${encodeURIComponent(location)}&t=m&z=${zoom}&ie=UTF8&iwloc=&output=embed`;
+            };
+
+            const getWeatherUrl = (location) => {
+                return `https://weather.com/weather/today/l/${encodeURIComponent(location)}`;
+            }
+
+            // Open Native Maps
             const openMaps = (location) => {
                 window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(location)}`, '_blank');
+            };
+
+            const copyToClipboard = (text) => {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+                    alert("Summary copied to clipboard!");
+                } else {
+                    fallbackCopy(text);
+                }
+            };
+            
+            const fallbackCopy = (text) => {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert("Summary copied to clipboard!");
+                } catch (err) {
+                    console.error('Fallback copy failed', err);
+                }
+                document.body.removeChild(textArea);
+            };
+
+            const shareTrip = () => {
+                const text = `PAVE X 2026 Status: ${daysUntil} Days to go! Taking the ${theme.carName}. New Albany -> NOLA -> Nashville.`;
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'PAVE X 2026 Trip',
+                        text: text,
+                    }).catch((error) => {
+                        if (error.name !== 'AbortError') {
+                            console.log('Share failed:', error);
+                            copyToClipboard(text);
+                        }
+                    });
+                } else {
+                    copyToClipboard(text);
+                }
             };
 
             const itinerary = [
@@ -132,6 +197,7 @@
                     day: "Saturday, Feb 7",
                     weather: "Cloudy 52°",
                     weatherIcon: CloudSun,
+                    location: "New Orleans, LA",
                     title: "The NOLA Push (715 Mi)",
                     events: [
                         { 
@@ -146,6 +212,7 @@
                             time: carType === 'mache' ? "7:15 AM" : "8:15 AM", 
                             title: carType === 'mache' ? "Buc-ee's Smiths Grove" : "Kroger Fuel Nashville", 
                             location: carType === 'mache' ? "Smiths Grove, KY" : "Nashville, TN", 
+                            prevLocation: "New Albany, IN",
                             type: "logistics",
                             distPrev: carType === 'mache' ? 105 : 175, distNext: carType === 'mache' ? 185 : 85, duration: 40,
                             longDesc: "Tactical Reset: Nashville Kroger allows for fuel points. Smiths Grove Buc-ee's offers high-output Level 3 chargers and breakfast brisket tacos."
@@ -154,7 +221,8 @@
                             id: "sat-stop2",
                             time: carType === 'mache' ? "10:40 AM" : "9:50 AM", 
                             title: carType === 'mache' ? "Buc-ee's Athens" : "Kroger Fuel Hartselle", 
-                            location: carType === 'mache' ? "Athens, AL" : "Hartselle, AL", 
+                            location: carType === 'mache' ? "Athens, AL" : "Hartselle, AL",
+                            prevLocation: carType === 'mache' ? "Smiths Grove, KY" : "Nashville, TN", 
                             type: "logistics",
                             distPrev: carType === 'mache' ? 185 : 85, distNext: carType === 'mache' ? 191 : 310, duration: 40,
                             longDesc: carType === 'camaro' 
@@ -166,6 +234,7 @@
                             time: carType === 'mache' ? "2:05 PM" : "2:35 PM", 
                             title: carType === 'mache' ? "Flying J Hope Hull" : "Buc-ee's Robertsdale", 
                             location: carType === 'mache' ? "Hope Hull, AL" : "Robertsdale, AL", 
+                            prevLocation: carType === 'mache' ? "Athens, AL" : "Hartselle, AL",
                             type: "logistics",
                             distPrev: carType === 'mache' ? 191 : 310, distNext: carType === 'mache' ? 165 : 144, duration: 40,
                             longDesc: carType === 'camaro' 
@@ -174,15 +243,17 @@
                         },
                         ...(carType === 'mache' ? [{
                             id: "sat-stop4-mache", time: "5:15 PM", title: "Pilot Travel Center", location: "Theodore, AL", type: "logistics",
+                            prevLocation: "Hope Hull, AL",
                             distPrev: 165, distNext: 135, duration: 30, longDesc: "Tactical Stop: Theodore Pilot Center. Bridging the gap to NOLA. A quick top-up ensures we arrive at the hotel with plenty of reserve for city driving."
                         }] : []),
                         { 
                             id: "sat-arrival",
                             time: carType === 'mache' ? "8:00 PM" : "5:15 PM", title: "Arrive NOLA Hotel", 
-                            location: "Hampton Inn & Suites Conv Ctr", 
+                            location: "Hampton Inn & Suites New Orleans Convention Center", 
+                            prevLocation: carType === 'mache' ? "Theodore, AL" : "Robertsdale, AL",
                             type: "logistics",
                             distPrev: carType === 'mache' ? 135 : 144, distNext: 0, duration: 0,
-                            longDesc: "Final Destination: Hampton Inn & Suites New Orleans Convention Center. Directly across from the Pave X venue. Park the car and relax."
+                            longDesc: "Final Destination: Hampton Inn & Suites New Orleans Convention Center. Directly across from the Pave X venue. Valet parking recommended. Check-in, grab a shower, and head to the Quarter."
                         }
                     ]
                 },
@@ -190,6 +261,7 @@
                     day: "Sunday, Feb 8",
                     weather: "Sunny 68°",
                     weatherIcon: Sun,
+                    location: "New Orleans, LA",
                     title: "Morning Run & Barkus",
                     events: [
                         { 
@@ -207,6 +279,7 @@
                     day: "Monday, Feb 9",
                     weather: "Rain 62°",
                     weatherIcon: CloudRain,
+                    location: "New Orleans, LA",
                     title: "Workshops & Kickoff",
                     events: [
                         { 
@@ -230,6 +303,7 @@
                     day: "Tuesday, Feb 10",
                     weather: "Sunny 70°",
                     weatherIcon: Sun,
+                    location: "New Orleans, LA",
                     title: "Expo & Awards",
                     events: [
                         { 
@@ -257,6 +331,7 @@
                     day: "Wednesday, Feb 11",
                     weather: "Clear 55°",
                     weatherIcon: Sun,
+                    location: "Nashville, TN",
                     title: "Nashville Sprint",
                     events: [
                         { 
@@ -268,6 +343,7 @@
                             time: "10:00 AM", 
                             title: carType === 'camaro' ? "Buc-ee's Robertsdale" : "Pilot Travel Center", 
                             location: carType === 'camaro' ? "Robertsdale, AL" : "Theodore, AL", 
+                            prevLocation: "New Orleans, LA",
                             type: "logistics",
                             distNext: carType === 'camaro' ? 310 : 150,
                             longDesc: carType === 'camaro' 
@@ -278,7 +354,8 @@
                             id: "wed-fuel2",
                             time: carType === 'mache' ? "1:00 PM" : "3:00 PM", 
                             title: carType === 'camaro' ? "Kroger Fuel Hartselle" : "Flying J Hope Hull", 
-                            location: carType === 'camaro' ? "Hartselle, AL" : "Hope Hull, AL", 
+                            location: carType === 'camaro' ? "Hartselle, AL" : "Hope Hull, AL",
+                            prevLocation: carType === 'camaro' ? "Robertsdale, AL" : "Theodore, AL",
                             longDesc: carType === 'camaro' 
                                 ? "Hartselle Points Reclaim: After the 310-mile range-stretching leg, we arrive back at our Kroger anchor. Fill up here to reclaim fuel points and ensure the V8 is ready for the Tennessee hill climbs into Nashville."
                                 : "Mach-E Hub: Back at the Flying J in Hope Hull. This 150-mile leg through South Alabama ensures we have the juice for the long 191-mile verified push into the Athens Buc-ee's high-speed chargers."
@@ -288,6 +365,7 @@
                             time: carType === 'mache' ? "4:15 PM" : "4:45 PM", 
                             title: carType === 'mache' ? "Buc-ee's Athens" : "Kroger Fuel Nashville",
                             location: carType === 'mache' ? "Athens, AL" : "Nashville, TN",
+                            prevLocation: carType === 'mache' ? "Hope Hull, AL" : "Hartselle, AL",
                             type: "logistics",
                             longDesc: carType === 'mache'
                                 ? "Critical Mach-E Charge: Buc-ee's Athens. This 191-mile leg from Hope Hull is the longest EV stretch. We top off here to ensure we arrive at the Opry with plenty of range."
@@ -308,33 +386,47 @@
                     day: "Thursday, Feb 12",
                     weather: "Cloudy 45°",
                     weatherIcon: CloudSun,
+                    location: "Nashville, TN",
                     title: "Home Stretch",
                     events: [
-                        { id: "thu-start", time: "9:00 AM", title: "Depart Nashville", location: "Opryland", type: "travel" },
                         { 
-                            id: "thu-stop1",
-                            time: "10:30 AM", 
-                            title: carType === 'mache' ? "Buc-ee's Smiths Grove" : "Home Run", 
-                            location: carType === 'mache' ? "Smiths Grove, KY" : "New Albany, IN", 
-                            type: carType === 'mache' ? "logistics" : "travel",
-                            longDesc: carType === 'mache' 
-                                ? "Final Mach-E charge. Buc-ee's Smiths Grove ensures you arrive in New Albany with enough battery to run errands for the rest of the week." 
-                                : "The Camaro SS cruises straight through. No stops needed after the Hartselle top-off on Wednesday."
+                            id: "thu-start", 
+                            time: "10:00 AM", 
+                            title: "Depart Nashville", 
+                            location: "Hampton Inn Opryland", 
+                            type: "travel", 
+                            distNext: 175, 
+                            longDesc: "Bags packed, receipts filed, and coffee in hand. The final 175-mile push north on I-65. Ensure the playlist is ready for the 2.5-hour drive. If driving the Mach-E, ensure 100% overnight charge for a non-stop run." 
                         },
                         { 
-                            id: "thu-home", time: "12:00 PM", title: "Arrive Home", location: "New Albany, IN", type: "travel",
-                            longDesc: "Trip Complete. Back in New Albany ready for the 2026 paving season."
+                            id: "thu-home", 
+                            time: "12:30 PM", 
+                            title: "Arrive Home", 
+                            location: "New Albany, IN", 
+                            type: "travel",
+                            prevLocation: "Nashville, TN",
+                            longDesc: "Mission Accomplished. 1,605 miles in the books. Welcome back to Indiana. Time to unload the Pave X swag, process the tax deductions, and gear up for the 2026 paving season."
                         }
                     ]
                 }
             ];
 
             const funEvents = [
-                { id: "barkus", title: "Barkus Dog Parade", time: "Sun 2 PM", icon: Dog, desc: "Costumed pups on Royal Street.", cost: "Free", color: "from-orange-400 to-red-500", longDesc: "NOLA's premier dog parade! Hundreds of dogs in 'Wicked' costumes lead owners through the Quarter. The atmosphere is electric but family-friendly. It's a visual spectacle of creativity and local spirit." },
-                { id: "nba", title: "Pelicans vs Kings", time: "Mon 7 PM", icon: Ticket, desc: "NBA Home Game.", cost: "$45", color: "from-blue-600 to-indigo-700", longDesc: "Watch Zion at the Smoothie King Center. Target front-row upper section seats for the best view. The arena energy in NOLA is unique—expect brass bands in the stands and a high-energy crowd." },
-                { id: "bradlea", title: "Brad Lea Keynote", time: "Tue 1:30 PM", icon: User, desc: "Scaling & Sales Bio.", cost: "Badge", color: "from-amber-400 to-orange-600", longDesc: "Master closer Brad Lea shares the mindset for massive growth. Known for his 'Dropping Bombs' podcast, Brad focuses on 'Real World' sales strategies that apply directly to blue-collar service businesses like sealcoating." },
-                { id: "dinner", title: "Commander's Palace", time: "Tue 8 PM", icon: Utensils, desc: "Haute Creole Dining Landmark.", cost: "$100/pp", color: "from-teal-500 to-emerald-700", longDesc: "The crown jewel of New Orleans dining since 1893. Located in the heart of the Garden District, this blue-and-white Victorian landmark is famous for its award-winning Haute Creole cuisine and whimsical charm. We'll be dining in a room that has hosted presidents and celebrities. Don't miss the Turtle Soup or the legendary Bread Pudding Soufflé (must be ordered in advance!). A jacket is preferred for gentlemen. It's the ultimate way to celebrate a successful business trip before heading north." },
-                { id: "concert", title: "Conservation Aid", time: "Wed 7 PM", icon: Guitar, desc: "Grand Ole Opry Live.", cost: "$92", color: "from-purple-600 to-pink-600", longDesc: "This isn't your typical stadium concert. The 'Songwriters Round' format at the Grand Ole Opry is a Nashville tradition where artists sit in a semi-circle with their guitars and swap stories. You'll hear Thomas Rhett, Dustin Lynch, and Rhett Akins strip back the production and play their massive radio hits exactly how they were written. It’s intimate, funny, and incredibly moving. The acoustics in the Opry House are legendary. Plus, it supports the National Wild Turkey Federation, combining great music with a great cause." , setList: ["Die A Happy Man - Thomas Rhett", "Marry Me - Thomas Rhett", "Life Changes - Thomas Rhett", "Small Town Boy - Dustin Lynch", "Cowboys and Angels - Dustin Lynch", "Thinking 'Bout You - Dustin Lynch", "Honey Bee (Writer) - Rhett Akins", "Boys 'Round Here (Writer) - Rhett Akins", "That Ain't My Truck - Rhett Akins"]}
+                { id: "barkus", title: "Barkus Dog Parade", time: "Sun 2 PM", icon: Dog, desc: "Costumed pups on Royal Street.", location: "Royal St, New Orleans", cost: "Free", color: "from-orange-400 to-red-500", longDesc: "NOLA's premier dog parade! Hundreds of dogs in 'Wicked' costumes lead owners through the Quarter. The atmosphere is electric but family-friendly. It's a visual spectacle of creativity and local spirit.", website: "https://www.kreweofbarkus.org/" },
+                { id: "nba", title: "Pelicans vs Kings", time: "Mon 7 PM", icon: Ticket, desc: "NBA Home Game.", location: "Smoothie King Center", cost: "$45", color: "from-blue-600 to-indigo-700", longDesc: "Watch Zion at the Smoothie King Center. Target front-row upper section seats for the best view. The arena energy in NOLA is unique—expect brass bands in the stands and a high-energy crowd.", website: "https://www.nba.com/pelicans" },
+                { id: "bradlea", title: "Brad Lea Keynote", time: "Tue 1:30 PM", icon: User, desc: "Scaling & Sales Bio.", location: "Convention Center Blvd, New Orleans", cost: "Badge", color: "from-amber-400 to-orange-600", longDesc: "Master closer Brad Lea shares the mindset for massive growth. Known for his 'Dropping Bombs' podcast, Brad focuses on 'Real World' sales strategies that apply directly to blue-collar service businesses like sealcoating.", website: "https://www.pavexshow.com/" },
+                { id: "dinner", title: "Commander's Palace", time: "Tue 8 PM", icon: Utensils, desc: "Haute Creole Dining Landmark.", location: "1403 Washington Ave, New Orleans", cost: "$100/pp", color: "from-teal-500 to-emerald-700", longDesc: "The crown jewel of New Orleans dining since 1893. Located in the heart of the Garden District, this blue-and-white Victorian landmark is famous for its award-winning Haute Creole cuisine and whimsical charm. We'll be dining in a room that has hosted presidents and celebrities. Don't miss the Turtle Soup or the legendary Bread Pudding Soufflé (must be ordered in advance!). A jacket is preferred for gentlemen. It's the ultimate way to celebrate a successful business trip before heading north.", link: "View Menu", website: "https://www.commanderspalace.com/" },
+                { id: "concert", title: "Conservation Aid", time: "Wed 7 PM", icon: Guitar, desc: "Grand Ole Opry Live.", location: "2804 Opryland Dr, Nashville", cost: "$92", color: "from-purple-600 to-pink-600", longDesc: "This isn't your typical stadium concert. The 'Songwriters Round' format at the Grand Ole Opry is a Nashville tradition where artists sit in a semi-circle with their guitars and swap stories. You'll hear Thomas Rhett, Dustin Lynch, and Rhett Akins strip back the production and play their massive radio hits exactly how they were written. It’s intimate, funny, and incredibly moving. The acoustics in the Opry House are legendary. Plus, it supports the National Wild Turkey Federation, combining great music with a great cause." , setList: ["Die A Happy Man - Thomas Rhett", "Marry Me - Thomas Rhett", "Life Changes - Thomas Rhett", "Small Town Boy - Dustin Lynch", "Cowboys and Angels - Dustin Lynch", "Thinking 'Bout You - Dustin Lynch", "Honey Bee (Writer) - Rhett Akins", "Boys 'Round Here (Writer) - Rhett Akins", "That Ain't My Truck - Rhett Akins"], link: "Spotify Playlist", website: "https://www.opry.com/"}
+            ];
+
+            const moneyBreakdown = [
+                { id: "tax-pavex", item: "Pave X Registration", cost: `$${tripData.costs.paveX}`, status: "Deduction", type: "Business", reason: "Direct industry training.", longDesc: "100% deductible as a business expense. Pave X is a professional trade show directly related to A&S Sealcoating operations. The IRS allows full deduction for professional development events including registration fees for both owners." },
+                { id: "tax-hotel", item: "Hotels (NOLA + Nash)", cost: `$${totalHotelCost.toFixed(2)}`, status: "Deduction", type: "Business", reason: "Business Lodging.", longDesc: "Lodging is 100% deductible when the primary purpose of the travel is professional. Includes 4 nights in NOLA and 1 night in Nashville as part of the return travel." },
+                { id: "tax-mileage", item: `Mileage Deduction`, cost: `$${tripData.costs.mileageDeduction}`, status: "Deduction", type: "Business", reason: "IRS Standard Rate.", longDesc: `The IRS standard rate (~70¢/mi) accounts for the total cost of ownership including fuel, maintenance, and depreciation. For this 1,605-mile trip, the deduction is $${tripData.costs.mileageDeduction}, which is almost 4x your actual out-of-pocket fuel/charge costs.` },
+                { id: "tax-food", item: "Meals & Dining", cost: `~$${tripData.costs.foodEst}`, status: "50% Deductible", type: "Mixed", reason: "Business Meals.", longDesc: "Meals incurred while traveling for business are 50% deductible. This includes your dinners at Commander's Palace and lunch stops. Keep receipts!" },
+                { id: "tax-fuel", item: "Actual Driving Cost", cost: `$${tripData.costs.drivingCost}`, status: "Expense", type: "Cash Flow", reason: carType === 'camaro' ? "$0.18/mi" : "$0.17/mi", longDesc: "Out-of-pocket spend for fuel or high-speed charging. Vital for cash flow tracking at A&S, but you typically take the Standard Mileage Deduction instead of this actual cost on your taxes." },
+                { id: "tax-nba", item: "NBA Tickets", cost: `$${tripData.costs.nba * 2}`, status: "Personal", type: "Personal", reason: "Entertainment Rule.", longDesc: "Under current tax law (TCJA), most entertainment expenses are non-deductible. Even if business is discussed during the Pelicans game, the IRS views this as personal recreation for tax purposes." },
+                { id: "tax-concert", item: "Concert Tickets", cost: `$${tripData.costs.concert * 2}`, status: "Personal", type: "Personal", reason: "Entertainment Rule.", longDesc: "Considered personal recreation. It's an amazing finale to the trip, but we'll keep this out of the business column to ensure our A&S tax records are audit-proof. Charity status (Conservation Aid) may change personal tax status, but not business deduction status." },
             ];
 
             const TabButton = ({ id, icon: Icon, label }) => (
@@ -363,20 +455,26 @@
                                 <div>
                                     <h1 className="text-3xl font-black italic uppercase leading-none tracking-tighter">PAVE X '26</h1>
                                     <div className="flex items-center gap-2 mt-2 opacity-90">
-                                        <div className="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-white/10">
-                                            {tripData.dates}
+                                        <div className="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-white/10 flex items-center gap-1">
+                                           <Timer size={10} /> {daysUntil} Days To Go
                                         </div>
+                                        <button onClick={shareTrip} className="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-white/10 flex items-center gap-1 active:bg-white/40">
+                                            <Share2 size={10} /> Share Status
+                                        </button>
                                     </div>
                                 </div>
                                 
-                                {/* Car Toggle */}
-                                <div className="bg-black/20 backdrop-blur-md p-1 rounded-xl flex border border-white/10">
-                                    <button onClick={() => setCarType('camaro')} className={`p-2 rounded-lg transition-all ${carType === 'camaro' ? 'bg-white text-amber-600 shadow-sm' : 'text-white/60'}`}>
-                                        <Car size={18} />
-                                    </button>
-                                    <button onClick={() => setCarType('mache')} className={`p-2 rounded-lg transition-all ${carType === 'mache' ? 'bg-white text-blue-600 shadow-sm' : 'text-white/60'}`}>
-                                        <Zap size={18} />
-                                    </button>
+                                {/* Header Actions */}
+                                <div className="flex gap-2">
+                                    {/* Car Toggle */}
+                                    <div className="bg-black/20 backdrop-blur-md p-1 rounded-xl flex border border-white/10">
+                                        <button onClick={() => setCarType('camaro')} className={`p-2 rounded-lg transition-all ${carType === 'camaro' ? 'bg-white text-amber-600 shadow-sm' : 'text-white/60'}`}>
+                                            <Car size={18} />
+                                        </button>
+                                        <button onClick={() => setCarType('mache')} className={`p-2 rounded-lg transition-all ${carType === 'mache' ? 'bg-white text-blue-600 shadow-sm' : 'text-white/60'}`}>
+                                            <Zap size={18} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -412,10 +510,14 @@
                                                 <h3 className="font-black text-gray-800 text-lg uppercase leading-none italic">{day.title}</h3>
                                                 <p className="text-xs text-gray-500 font-bold mt-1 uppercase tracking-wide">{day.day}</p>
                                             </div>
-                                            <div className="bg-white px-2 py-1 rounded-lg border border-gray-100 flex items-center gap-1.5 shadow-sm">
+                                            {/* Weather Link */}
+                                            <button 
+                                                onClick={() => window.open(getWeatherUrl(day.location || "New Orleans, LA"), '_blank')}
+                                                className="bg-white px-2 py-1 rounded-lg border border-gray-100 flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform"
+                                            >
                                                 <day.weatherIcon size={14} className={`text-${theme.primary}-500`} />
                                                 <span className="text-[10px] font-bold text-gray-600">{day.weather}</span>
-                                            </div>
+                                            </button>
                                         </div>
 
                                         <div className="space-y-3">
@@ -453,6 +555,20 @@
 
                                                         {expandedStop === event.id && (
                                                             <div className="mt-3 pt-3 border-t border-gray-100 animate-slide-up">
+                                                                {/* Map Preview - Only for Driving Trips (defined by having a prevLocation) */}
+                                                                {event.prevLocation && (
+                                                                    <div className="w-full h-40 bg-gray-100 rounded-xl mb-3 overflow-hidden border border-gray-200">
+                                                                        <iframe
+                                                                            width="100%"
+                                                                            height="100%"
+                                                                            frameBorder="0"
+                                                                            style={{ border: 0 }}
+                                                                            src={getMapUrl(event.location, event.prevLocation)}
+                                                                            allowFullScreen
+                                                                        ></iframe>
+                                                                    </div>
+                                                                )}
+
                                                                 {/* Rich Details Render */}
                                                                 {event.details && (
                                                                      <div className={`mb-3 p-3 rounded-lg bg-${theme.bg} border border-${theme.border}`}>
@@ -466,18 +582,23 @@
 
                                                                 <p className="text-xs text-gray-600 leading-relaxed mb-3">{event.longDesc}</p>
                                                                 
+                                                                {/* Buttons Grid */}
                                                                 <div className="grid grid-cols-2 gap-2">
                                                                     <button onClick={(e) => { e.stopPropagation(); openMaps(event.location); }} 
-                                                                        className={`flex items-center justify-center gap-2 py-2 rounded-lg bg-${theme.primary}-600 text-white font-bold text-xs shadow-md active:opacity-90`}>
-                                                                        <Navigation size={14} /> Open GPS
+                                                                        className={`col-span-2 flex items-center justify-center gap-2 py-2 rounded-lg bg-${theme.primary}-600 text-white font-bold text-xs shadow-md active:opacity-90`}>
+                                                                        <Navigation size={14} /> Open Navigation
                                                                     </button>
-                                                                    {event.distNext > 0 && (
-                                                                        <div className="flex flex-col items-center justify-center py-1 rounded-lg bg-gray-50 border border-gray-200">
-                                                                            <span className="text-[9px] uppercase font-bold text-gray-400">Next Leg</span>
-                                                                            <span className="text-xs font-black text-gray-800">{event.distNext} Mi</span>
-                                                                        </div>
-                                                                    )}
                                                                 </div>
+
+                                                                {event.distNext > 0 && (
+                                                                    <div className="mt-2 flex items-center justify-between p-2 rounded-lg bg-gray-50 border border-gray-200">
+                                                                        <div className="flex items-center gap-2">
+                                                                            <ArrowRightLeft size={12} className="text-gray-400" />
+                                                                            <span className="text-[9px] uppercase font-bold text-gray-400">Next Leg</span>
+                                                                        </div>
+                                                                        <span className="text-xs font-black text-gray-800">{event.distNext} Mi</span>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         )}
                                                     </div>
@@ -513,6 +634,7 @@
                                             {expandedEvent === event.id && (
                                                 <div className="mt-4 animate-in slide-in-from-top-4 duration-300">
                                                     <div className="bg-black/20 p-4 rounded-2xl backdrop-blur-md border border-white/10">
+                                                        
                                                         <p className="text-xs font-medium leading-relaxed mb-4">{event.longDesc}</p>
                                                         
                                                         {/* Set List Section */}
@@ -530,11 +652,20 @@
                                                             </div>
                                                         )}
 
-                                                        <button 
-                                                            onClick={(e) => {e.stopPropagation(); openMaps(event.location || event.title);}}
-                                                            className="w-full py-2 bg-white text-black font-bold text-xs rounded-xl flex items-center justify-center gap-2 mt-2">
-                                                            <Navigation size={12}/> Get Directions
-                                                        </button>
+                                                        <div className="grid grid-cols-2 gap-2 mt-2">
+                                                            <button 
+                                                                onClick={(e) => {e.stopPropagation(); window.open(event.website, '_blank');}}
+                                                                className="w-full py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all">
+                                                                <Globe size={14}/> Visit Website
+                                                            </button>
+                                                            {event.link && (
+                                                                <button 
+                                                                    onClick={(e) => {e.stopPropagation(); alert(`Opening ${event.link}... (Mock)`)}}
+                                                                    className={`w-full py-3 bg-white text-${event.color.split('-')[1]}-600 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all shadow-md`}>
+                                                                    {event.link === "Spotify Playlist" ? <Music size={14}/> : <ExternalLink size={14}/>} {event.link}
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             )}
@@ -550,24 +681,72 @@
                             <div className="space-y-4 animate-slide-up">
                                 <div className={`bg-gradient-to-r ${theme.gradient} rounded-2xl p-6 text-white shadow-lg relative overflow-hidden`}>
                                     <div className="relative z-10">
-                                        <p className="text-[10px] uppercase font-bold opacity-80 mb-1">Total Estimated Deduction</p>
-                                        <h2 className="text-4xl font-black tracking-tight">${parseInt(totalTaxDeduction).toLocaleString()}</h2>
-                                        <div className="mt-4 h-2 bg-black/20 rounded-full overflow-hidden">
-                                            <div className="h-full bg-white/40 w-[75%]"></div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Calculator size={14} className="opacity-80"/>
+                                            <p className="text-[10px] uppercase font-bold opacity-80">Total Est. Tax Deduction</p>
                                         </div>
-                                        <p className="text-[9px] mt-2 opacity-70 italic">Includes hotel, mileage, and registration.</p>
+                                        <h2 className="text-4xl font-black tracking-tight">${parseInt(totalTaxDeduction).toLocaleString()}</h2>
+                                        <div className="mt-4 flex gap-2">
+                                            <span className="bg-white/20 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold uppercase border border-white/10">IRS 2026 Rules</span>
+                                            <button onClick={() => copyToClipboard(`PAVE X 2026 Expense Report\nTotal Est. Deduction: $${parseInt(totalTaxDeduction)}\nDetails:\n${moneyBreakdown.map(m => `- ${m.item}: ${m.cost} (${m.status})`).join('\n')}`)} className="bg-white/20 backdrop-blur-md px-2 py-1 rounded text-[10px] font-bold uppercase border border-white/10 flex items-center gap-1 active:bg-white/40"><Copy size={10} /> Copy Report</button>
+                                        </div>
+                                        <p className="text-[9px] mt-3 opacity-70 italic leading-relaxed max-w-[80%]">
+                                            Includes lodging, registration, and standard mileage rate (70¢/mi).
+                                        </p>
                                     </div>
                                     <DollarSign className="absolute -bottom-4 -right-4 text-white opacity-10" size={120} />
                                 </div>
 
-                                <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-                                    {[{l:"Pave X Reg", c:595, t:"Full"}, {l:"Hotels", c:totalHotelCost, t:"Full"}, {l:"Mileage (IRS)", c:tripData.costs.mileageDeduction, t:"Rate"}, {l:"Meals", c:tripData.costs.foodEst, t:"50%"}].map((item, i) => (
-                                        <div key={i} className="flex justify-between items-center p-4 border-b border-gray-50 last:border-0">
-                                            <div>
-                                                <p className="text-xs font-black text-gray-800 uppercase">{item.l}</p>
-                                                <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${item.t === 'Full' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>{item.t} Deductible</span>
+                                <div className="space-y-3">
+                                    <h3 className="text-xs font-black uppercase text-gray-400 pl-2">Expense Ledger</h3>
+                                    {moneyBreakdown.map((item, i) => (
+                                        <div key={i} onClick={() => setExpandedMoney(expandedMoney === item.id ? null : item.id)} 
+                                            className={`bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all active:scale-[0.99] cursor-pointer ${expandedMoney === item.id ? 'ring-2 ring-blue-500 ring-offset-2' : ''}`}>
+                                            
+                                            <div className="p-4 flex justify-between items-center">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                                        item.type === 'Business' ? 'bg-green-100 text-green-600' :
+                                                        item.type === 'Personal' ? 'bg-red-100 text-red-600' : 'bg-amber-100 text-amber-600'
+                                                    }`}>
+                                                        {item.type === 'Business' ? <Briefcase size={18} /> : 
+                                                         item.type === 'Personal' ? <User size={18} /> : <Wallet size={18} />}
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-black text-gray-800 text-sm">{item.item}</p>
+                                                        <p className="text-[10px] font-bold text-gray-400 uppercase mt-0.5">{item.status}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-mono font-bold text-gray-800">{item.cost}</p>
+                                                    {expandedMoney === item.id ? <ChevronUp size={14} className="ml-auto mt-1 text-gray-400"/> : <ChevronDown size={14} className="ml-auto mt-1 text-gray-400"/>}
+                                                </div>
                                             </div>
-                                            <p className="font-mono font-bold text-gray-600">${parseInt(item.c)}</p>
+
+                                            {expandedMoney === item.id && (
+                                                <div className="bg-slate-50 border-t border-gray-100 p-4 animate-slide-up">
+                                                    <div className="flex items-start gap-3 mb-3">
+                                                        <Landmark size={16} className="text-slate-400 shrink-0 mt-0.5" />
+                                                        <div>
+                                                            <p className="text-[10px] font-black uppercase text-slate-500 mb-1">IRS Logic: {item.reason}</p>
+                                                            <p className="text-xs text-slate-700 leading-relaxed">{item.longDesc}</p>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    {item.status === 'Deduction' && (
+                                                        <div className="bg-green-100 border border-green-200 p-2 rounded-lg flex items-center gap-2">
+                                                            <CheckCircle2 size={14} className="text-green-600" />
+                                                            <span className="text-[10px] font-bold text-green-800 uppercase">Recommended: Charge to Company Card</span>
+                                                        </div>
+                                                    )}
+                                                    {item.status === 'Personal' && (
+                                                        <div className="bg-red-50 border border-red-100 p-2 rounded-lg flex items-center gap-2">
+                                                            <AlertTriangle size={14} className="text-red-500" />
+                                                            <span className="text-[10px] font-bold text-red-800 uppercase">Warning: Use Personal Card</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
