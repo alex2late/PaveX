@@ -37,6 +37,8 @@
         }
         body {
             background-color: #0f172a; /* Slate 900 background for desktop view */
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
         }
     </style>
 </head>
@@ -49,13 +51,12 @@
         import { createRoot } from 'react-dom/client';
         import { 
             Car, MapPin, Calendar, Music, Trophy, Receipt, ChevronRight, Dog, 
-            AlertCircle, Info, Navigation, Clock, BatteryCharging, Fuel, Zap, 
+            Info, Navigation, Clock, Fuel, Zap, 
             CheckCircle2, Utensils, Hotel, ArrowRightLeft, User, Ticket, Star, 
             PartyPopper, Mic2, ChevronDown, ChevronUp, DollarSign, Briefcase, 
-            AlertTriangle, TrendingUp, Coffee, Warehouse, ZapOff, Gauge, 
-            ParkingCircle, Map as MapIcon, Timer, ShoppingBag, Award, Activity, 
-            Mountain, Footprints, Camera, Image as ImageIcon, Home, Guitar,
-            Flame
+            AlertTriangle, TrendingUp, Warehouse, ZapOff, Gauge, 
+            Map as MapIcon, Award, Activity, 
+            Mountain, Footprints, Camera, Home, Guitar
         } from 'lucide-react';
 
         const App = () => {
@@ -166,8 +167,9 @@
                         },
                         { 
                             id: "sat-arrival",
-                            time: carType === 'mache' ? "5:00 PM" : "5:15 PM", title: "Arrive NOLA Hotel", location: "Hampton Inn Convention Ctr", 
-                            prevLocation: carType === 'mache' ? "Hope Hull, AL" : "Robertsdale, AL",
+                            time: carType === 'mache' ? "5:00 PM" : "5:15 PM", title: "Arrive NOLA Hotel", 
+                            location: "Hampton Inn & Suites New Orleans Convention Center", 
+                            prevLocation: carType === 'mache' ? "Flying J Travel Center, Hope Hull, AL" : "Buc-ee's, Robertsdale, AL",
                             type: "logistics",
                             distPrev: carType === 'mache' ? 150 : 144, distNext: 0, duration: 0, timeToNext: "0m",
                             longDesc: "Final Destination: Hampton Inn & Suites New Orleans Convention Center. Directly across from the Pave X venue. Park the car and relax."
@@ -247,14 +249,22 @@
                     day: "Wednesday, Feb 11",
                     title: "Nashville Concert Sprint",
                     events: [
-                        { id: "wed-start", time: carType === 'mache' ? "7:30 AM" : "8:00 AM", title: "Depart NOLA", location: "Convention Center Blvd, NOLA", type: "travel", distPrev: 0, distNext: 132, duration: 0, timeToNext: "2h 00m",
+                        { id: "wed-start", time: carType === 'mache' ? "7:30 AM" : "8:00 AM", title: "Depart NOLA", location: "Convention Center Blvd, NOLA", type: "travel", distPrev: 0, 
+                        distNext: carType === 'camaro' ? 144 : 132, 
+                        duration: 0, timeToNext: "2h 00m",
                         longDesc: "Heading North. The return sprint to Nashville. We need to reach the hotel by late afternoon to freshen up for the Opry."
                         },
                         { 
                             id: "wed-fuel1",
-                            time: "10:00 AM", title: "Pilot Theodore", location: "Theodore, AL", prevLocation: "New Orleans, LA", type: "logistics",
-                            distPrev: 132, distNext: carType === 'camaro' ? 310 : 150, duration: 40, timeToNext: carType === 'mache' ? "4h 30m" : "2h 10m",
-                            longDesc: "User Verified: Exactly 132 miles from NOLA. Camaro SS must fill to the brim for the 310-mile return 'Mega Leg' back to Hartselle. We'll be skipping Montgomery entirely to maximize V8 efficiency and fuel points."
+                            time: "10:00 AM", 
+                            title: carType === 'camaro' ? "Buc-ee's Robertsdale" : "Pilot Theodore", 
+                            location: carType === 'camaro' ? "Robertsdale, AL" : "Theodore, AL", 
+                            prevLocation: "New Orleans, LA", type: "logistics",
+                            distPrev: carType === 'camaro' ? 144 : 132, 
+                            distNext: carType === 'camaro' ? 310 : 150, duration: 40, timeToNext: carType === 'mache' ? "4h 30m" : "2h 10m",
+                            longDesc: carType === 'camaro' 
+                                ? "Buc-ee's Return: 144 miles from NOLA. We're hitting the Robertsdale Buc-ee's again for the return trip. Fill to the brim for the 310-mile 'Mega Leg' back to Hartselle."
+                                : "User Verified: Exactly 132 miles from NOLA. Mach-E stop at Pilot Theodore before the push north."
                         },
                         { 
                             id: "wed-fuel2",
@@ -268,9 +278,24 @@
                                 ? "Hartselle Points Reclaim: After the 310-mile range-stretching leg, we arrive back at our Kroger anchor. Fill up here to reclaim fuel points and ensure the V8 is ready for the Tennessee hill climbs into Nashville."
                                 : "Mach-E Hub: Back at the Flying J in Hope Hull. This 150-mile leg through South Alabama ensures we have the juice for the long 191-mile verified push into the Athens Buc-ee's high-speed chargers."
                         },
+                        {
+                            id: "wed-fuel3",
+                            time: carType === 'mache' ? "4:15 PM" : "4:30 PM", 
+                            title: carType === 'mache' ? "Buc-ee's Athens" : "Tennessee State Line",
+                            location: carType === 'mache' ? "Athens, AL" : "I-65 N",
+                            prevLocation: "Hope Hull, AL",
+                            type: carType === 'mache' ? "logistics" : "travel",
+                            distPrev: carType === 'mache' ? 191 : 85,
+                            distNext: carType === 'mache' ? 100 : 100,
+                            duration: carType === 'mache' ? 35 : 0,
+                            timeToNext: "1h 30m",
+                            longDesc: carType === 'mache'
+                                ? "Critical Mach-E Charge: Buc-ee's Athens. This 191-mile leg from Hope Hull is the longest EV stretch. We top off here to ensure we arrive at the Opry with plenty of range."
+                                : "Cruising past Athens. The Camaro has plenty of range from the Hartselle top-off to reach Nashville non-stop."
+                        },
                         { 
                             id: "concert",
-                            time: "7:00 PM", title: "Conservation Aid Concert", location: "2804 Opryland Dr, Nashville", prevLocation: carType === 'camaro' ? "Hartselle, AL" : "Hope Hull, AL", type: "event",
+                            time: "7:00 PM", title: "Conservation Aid Concert", location: "2804 Opryland Dr, Nashville", prevLocation: carType === 'camaro' ? "Hartselle, AL" : "Athens, AL", type: "event",
                             details: { title: "Conservation Aid 2026", content: "A special songwriters round featuring Thomas Rhett and Dustin Lynch. Intimate storyteller format at the Grand Ole Opry.", icon: Guitar, cost: "$92" },
                             longDesc: "The Grand Finale. An intimate night at the legendary Grand Ole Opry. Thomas Rhett and Dustin Lynch share the stage in a storytelling format, raising money for the National Wild Turkey Federation."
                         },
@@ -328,7 +353,7 @@
             ];
 
             const fuelStats = [
-                { label: "Est. Trip Cost", value: `$${tripData.costs.drivingCost}`, icon: DollarSign },
+                { label: carType === 'camaro' ? "Gas Cost" : "Charge Cost", value: `$${tripData.costs.drivingCost}`, icon: DollarSign },
                 { label: "Tank Limit", value: carType === 'camaro' ? "320 Mi" : "185 Mi", icon: Gauge },
                 { label: "Hotel Total", value: `$${totalHotelCost.toFixed(0)}`, icon: Hotel },
             ];
@@ -340,51 +365,42 @@
                 <div className="bg-gray-100 flex-1 w-full overflow-hidden flex flex-col h-full sm:rounded-3xl">
                 {/* Header */}
                 <div className="bg-slate-950 text-white p-6 relative overflow-hidden shrink-0">
-                    {/* Background Texture/Gradient */}
-                    <div className={`absolute inset-0 opacity-20 bg-gradient-to-br ${carType === 'camaro' ? 'from-amber-600/30 to-orange-900/30' : 'from-blue-600/30 to-indigo-900/30'}`}></div>
-                    <div className="absolute top-0 right-0 p-8 opacity-10 rotate-12">
-                        {carType === 'camaro' ? renderIcon(Flame, { size: 140 }) : renderIcon(Zap, { size: 140 })}
+                    <div className="absolute top-0 right-0 p-8 opacity-10">
+                    {carType === 'camaro' ? renderIcon(Fuel, { size: 120 }) : renderIcon(Zap, { size: 120 })}
+                    </div>
+                    <div className="flex justify-between items-start relative z-10">
+                    <div>
+                        <h1 className="text-2xl font-black tracking-tight italic uppercase leading-none">PAVE X 2026</h1>
+                        <p className="text-slate-400 text-[10px] font-bold flex items-center gap-1 mt-2 uppercase tracking-tighter">
+                        <Navigation size={10} /> {tripData.route}
+                        </p>
+                    </div>
+                    <div className="bg-slate-900 p-1 rounded-xl border border-slate-700 flex shadow-lg">
+                        <button 
+                            onClick={() => setCarType('camaro')}
+                            className={`px-3 py-2 rounded-lg flex flex-col items-center transition-all ${carType === 'camaro' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300'}`}
+                        >
+                            <Car size={18} />
+                            <span className="text-[8px] font-black uppercase mt-0.5">Camaro SS</span>
+                        </button>
+                        <button 
+                            onClick={() => setCarType('mache')}
+                            className={`px-3 py-2 rounded-lg flex flex-col items-center transition-all ${carType === 'mache' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300'}`}
+                        >
+                            <Zap size={18} />
+                            <span className="text-[8px] font-black uppercase mt-0.5">Mach-E</span>
+                        </button>
+                    </div>
                     </div>
 
-                    <div className="flex justify-between items-center relative z-10 mb-6">
-                        <div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">A&S Sealcoating Trip</p>
-                            <h1 className="text-3xl font-black tracking-tight italic uppercase leading-none">PAVE X 2026</h1>
-                            <div className="flex items-center gap-1 mt-1 text-slate-300">
-                                <MapIcon size={12} />
-                                <p className="text-[10px] font-bold uppercase tracking-wider">{tripData.route}</p>
-                            </div>
-                        </div>
-                        
-                        {/* Vehicle Toggle Switch */}
-                        <div className="bg-slate-900 p-1 rounded-xl border border-slate-700 flex shadow-lg">
-                            <button 
-                                onClick={() => setCarType('camaro')}
-                                className={`px-3 py-2 rounded-lg flex flex-col items-center transition-all ${carType === 'camaro' ? 'bg-amber-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300'}`}
-                            >
-                                <Car size={18} />
-                                <span className="text-[8px] font-black uppercase mt-0.5">Camaro SS</span>
-                            </button>
-                            <button 
-                                onClick={() => setCarType('mache')}
-                                className={`px-3 py-2 rounded-lg flex flex-col items-center transition-all ${carType === 'mache' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300'}`}
-                            >
-                                <Zap size={18} />
-                                <span className="text-[8px] font-black uppercase mt-0.5">Mach-E</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-3 relative z-10">
+                    <div className="grid grid-cols-3 gap-2 mt-6">
                     {fuelStats.map((stat, i) => {
                         const Icon = stat.icon;
                         return (
-                        <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2 text-center backdrop-blur-sm">
-                            <div className={`mx-auto mb-1 ${carType === 'camaro' ? 'text-amber-500' : 'text-blue-400'}`}>
-                                {renderIcon(stat.icon, { size: 16 })}
-                            </div>
-                            <p className="text-[8px] opacity-60 leading-none uppercase font-bold tracking-wider">{stat.label}</p>
-                            <p className="text-sm font-black mt-0.5 tracking-tight">{stat.value}</p>
+                        <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-2 text-center">
+                            {renderIcon(stat.icon, { size: 14, className: "mx-auto mb-1 text-slate-400" })}
+                            <p className="text-[9px] opacity-60 leading-none uppercase font-bold">{stat.label}</p>
+                            <p className="text-xs font-black mt-1 tracking-tight">{stat.value}</p>
                         </div>
                         );
                     })}
@@ -396,18 +412,18 @@
                     
                     {activeTab === 'itinerary' && (
                     <div className="space-y-4">
-                        <div className={`p-3 rounded-xl border flex items-center gap-3 shadow-sm ${carType === 'camaro' ? 'bg-amber-50 border-amber-100' : 'bg-blue-50 border-blue-100'}`}>
-                            <MapIcon size={16} className={carType === 'camaro' ? 'text-amber-600' : 'text-blue-600'} />
-                            <p className={`text-[10px] font-black leading-tight uppercase tracking-tighter ${carType === 'camaro' ? 'text-amber-800' : 'text-blue-800'}`}>
-                                {carType === 'camaro' ? 'Kroger Points & V8 Range Optimized' : 'High-Speed Charging Route Loaded'}
-                            </p>
+                        <div className="bg-blue-50 p-3 rounded-xl border border-blue-100 flex items-center gap-3">
+                        <MapIcon size={16} className="text-blue-500 shrink-0" />
+                        <p className="text-[10px] text-blue-700 font-black leading-tight uppercase tracking-tighter">
+                            Map Enhanced: Click any stop to see the road route & details.
+                        </p>
                         </div>
 
                         {itinerary.map((day, idx) => (
                         <div key={idx} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                             <div className="bg-gray-50 p-3 border-b border-gray-100 flex justify-between items-center">
                             <h3 className="font-bold text-gray-800 text-xs flex items-center gap-2 uppercase tracking-tight">
-                                <Calendar size={12} className="text-slate-500" /> {day.day}
+                                <Calendar size={12} className="text-blue-600" /> {day.day}
                             </h3>
                             <span className={`text-[9px] px-2 py-0.5 rounded font-black uppercase tracking-tighter ${
                                 idx === 0 || idx === 5 ? 'bg-slate-200 text-slate-700' : 'bg-green-100 text-green-700'
@@ -418,12 +434,12 @@
                             <div className="p-4 space-y-4">
                             {day.events.map((event, eIdx) => {
                                 const IconComp = event.id === 'barkus' ? Dog :
-                                            event.id === 'sun-run' ? Activity :
-                                            event.id === 'tue-awards' ? Award :
-                                            event.id === 'thu-home' ? Home :
-                                            event.type === 'business' ? Briefcase : 
-                                            event.type === 'sports' ? Trophy : 
-                                            event.type === 'travel' ? Car : Clock;
+                                                event.id === 'sun-run' ? Activity :
+                                                event.id === 'tue-awards' ? Award :
+                                                event.id === 'thu-home' ? Home :
+                                                event.type === 'business' ? Briefcase : 
+                                                event.type === 'sports' ? Trophy : 
+                                                event.type === 'travel' ? Car : Clock;
                                 
                                 const isRisky = carType === 'camaro' && event.distNext >= 300;
 
@@ -686,7 +702,7 @@
                 </div>
 
                 {/* Bottom Nav */}
-                <div className="bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 max-w-md mx-auto shadow-2xl flex px-4 pb-6 pt-2 z-50 rounded-t-3xl shrink-0">
+                <div className="bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 max-w-md mx-auto shadow-2xl flex px-4 pb-2 pt-2 z-50 rounded-t-3xl shrink-0">
                     <TabButton id="itinerary" icon={Navigation} label="Route" />
                     <TabButton id="events" icon={PartyPopper} label="Fun" />
                     <TabButton id="tax" icon={Receipt} label="Money" />
