@@ -160,18 +160,34 @@
                             location: carType === 'mache' ? "Hope Hull, AL" : "Robertsdale, AL", 
                             prevLocation: carType === 'mache' ? "Athens, AL" : "Hartselle, AL",
                             type: "logistics",
-                            distPrev: carType === 'mache' ? 191 : 310, distNext: carType === 'mache' ? 150 : 144, duration: 40, timeToNext: "2h 15m",
+                            distPrev: carType === 'mache' ? 191 : 310, 
+                            distNext: carType === 'mache' ? 165 : 144, 
+                            duration: 40, 
+                            timeToNext: carType === 'mache' ? "2h 30m" : "2h 15m",
                             longDesc: carType === 'camaro' 
                                 ? "Range Success! Arrival at Buc-ee's Robertsdale on fumes (10mi range left). Beaver Nuggets and a celebratory top-off for the final night push." 
-                                : "Hope Hull verified anchor. Reliable high-speed charging bridges the gap from Central Alabama to the Mobile coastline."
+                                : "Hope Hull verified anchor. Reliable high-speed charging. We'll add a stop in Theodore to bridge the gap to NOLA."
                         },
+                        ...(carType === 'mache' ? [{
+                            id: "sat-stop4-mache",
+                            time: "5:15 PM",
+                            title: "Pilot Travel Center",
+                            location: "Theodore, AL",
+                            prevLocation: "Hope Hull, AL",
+                            type: "logistics",
+                            distPrev: 165,
+                            distNext: 135,
+                            duration: 30,
+                            timeToNext: "2h 10m",
+                            longDesc: "Tactical Stop: Theodore Pilot Center. Bridging the gap to NOLA. A quick top-up ensures we arrive at the hotel with plenty of reserve for city driving."
+                        }] : []),
                         { 
                             id: "sat-arrival",
-                            time: carType === 'mache' ? "5:00 PM" : "5:15 PM", title: "Arrive NOLA Hotel", 
+                            time: carType === 'mache' ? "8:00 PM" : "5:15 PM", title: "Arrive NOLA Hotel", 
                             location: "Hampton Inn & Suites New Orleans Convention Center", 
-                            prevLocation: carType === 'mache' ? "Flying J Travel Center, Hope Hull, AL" : "Buc-ee's, Robertsdale, AL",
+                            prevLocation: carType === 'mache' ? "Theodore, AL" : "Robertsdale, AL",
                             type: "logistics",
-                            distPrev: carType === 'mache' ? 150 : 144, distNext: 0, duration: 0, timeToNext: "0m",
+                            distPrev: carType === 'mache' ? 135 : 144, distNext: 0, duration: 0, timeToNext: "0m",
                             longDesc: "Final Destination: Hampton Inn & Suites New Orleans Convention Center. Directly across from the Pave X venue. Park the car and relax."
                         }
                     ]
@@ -257,45 +273,45 @@
                         { 
                             id: "wed-fuel1",
                             time: "10:00 AM", 
-                            title: carType === 'camaro' ? "Buc-ee's Robertsdale" : "Pilot Theodore", 
+                            title: carType === 'camaro' ? "Buc-ee's Robertsdale" : "Pilot Travel Center", 
                             location: carType === 'camaro' ? "Robertsdale, AL" : "Theodore, AL", 
                             prevLocation: "New Orleans, LA", type: "logistics",
                             distPrev: carType === 'camaro' ? 144 : 132, 
                             distNext: carType === 'camaro' ? 310 : 150, duration: 40, timeToNext: carType === 'mache' ? "4h 30m" : "2h 10m",
                             longDesc: carType === 'camaro' 
                                 ? "Buc-ee's Return: 144 miles from NOLA. We're hitting the Robertsdale Buc-ee's again for the return trip. Fill to the brim for the 310-mile 'Mega Leg' back to Hartselle."
-                                : "User Verified: Exactly 132 miles from NOLA. Mach-E stop at Pilot Theodore before the push north."
+                                : "User Verified: Exactly 132 miles from NOLA. Mach-E stop at Pilot Travel Center in Theodore before the push north."
                         },
                         { 
                             id: "wed-fuel2",
                             time: carType === 'mache' ? "1:00 PM" : "3:00 PM", 
                             title: carType === 'camaro' ? "Kroger Fuel Hartselle" : "Flying J Hope Hull", 
                             location: carType === 'camaro' ? "Hartselle, AL" : "Hope Hull, AL", 
-                            prevLocation: "Theodore, AL",
-                            type: "logistics",
-                            distPrev: carType === 'camaro' ? 310 : 150, distNext: carType === 'camaro' ? 85 : 191, duration: 40, timeToNext: carType === 'camaro' ? "1h 20m" : "2h 45m",
+                            distNext: carType === 'camaro' ? 85 : 191, duration: 40, timeToNext: carType === 'camaro' ? "1h 20m" : "2h 45m",
                             longDesc: carType === 'camaro' 
                                 ? "Hartselle Points Reclaim: After the 310-mile range-stretching leg, we arrive back at our Kroger anchor. Fill up here to reclaim fuel points and ensure the V8 is ready for the Tennessee hill climbs into Nashville."
                                 : "Mach-E Hub: Back at the Flying J in Hope Hull. This 150-mile leg through South Alabama ensures we have the juice for the long 191-mile verified push into the Athens Buc-ee's high-speed chargers."
                         },
                         {
                             id: "wed-fuel3",
-                            time: carType === 'mache' ? "4:15 PM" : "4:30 PM", 
-                            title: carType === 'mache' ? "Buc-ee's Athens" : "Tennessee State Line",
-                            location: carType === 'mache' ? "Athens, AL" : "I-65 N",
-                            prevLocation: "Hope Hull, AL",
-                            type: carType === 'mache' ? "logistics" : "travel",
+                            time: carType === 'mache' ? "4:15 PM" : "4:45 PM", 
+                            title: carType === 'mache' ? "Buc-ee's Athens" : "Kroger Fuel Nashville",
+                            location: carType === 'mache' ? "Athens, AL" : "Nashville, TN",
+                            prevLocation: carType === 'mache' ? "Hope Hull, AL" : "Hartselle, AL",
+                            type: "logistics",
                             distPrev: carType === 'mache' ? 191 : 85,
-                            distNext: carType === 'mache' ? 100 : 100,
-                            duration: carType === 'mache' ? 35 : 0,
-                            timeToNext: "1h 30m",
+                            distNext: carType === 'mache' ? 100 : 12,
+                            duration: carType === 'mache' ? 35 : 15,
+                            timeToNext: carType === 'mache' ? "1h 30m" : "0h 20m",
                             longDesc: carType === 'mache'
                                 ? "Critical Mach-E Charge: Buc-ee's Athens. This 191-mile leg from Hope Hull is the longest EV stretch. We top off here to ensure we arrive at the Opry with plenty of range."
-                                : "Cruising past Athens. The Camaro has plenty of range from the Hartselle top-off to reach Nashville non-stop."
+                                : "Strategic Top-Off: Kroger Nashville. Filling up here secures points and ensures a full tank for the week. It's a quick 15-minute stop before heading to Opryland."
                         },
                         { 
                             id: "concert",
-                            time: "7:00 PM", title: "Conservation Aid Concert", location: "2804 Opryland Dr, Nashville", prevLocation: carType === 'camaro' ? "Hartselle, AL" : "Athens, AL", type: "event",
+                            time: "7:00 PM", title: "Conservation Aid Concert", location: "2804 Opryland Dr, Nashville", 
+                            prevLocation: carType === 'camaro' ? "Nashville, TN" : "Athens, AL", 
+                            type: "event",
                             details: { title: "Conservation Aid 2026", content: "A special songwriters round featuring Thomas Rhett and Dustin Lynch. Intimate storyteller format at the Grand Ole Opry.", icon: Guitar, cost: "$92" },
                             longDesc: "The Grand Finale. An intimate night at the legendary Grand Ole Opry. Thomas Rhett and Dustin Lynch share the stage in a storytelling format, raising money for the National Wild Turkey Federation."
                         },
